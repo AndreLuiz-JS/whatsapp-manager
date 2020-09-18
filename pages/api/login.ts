@@ -29,6 +29,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 	if (email === process.env.ADMIN_EMAIL && !user) {
 		const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 5);
+		await collection.createIndex("email", { unique: true });
 		const { ops } = await collection.insertOne({
 			name: "Administrador",
 			email,
