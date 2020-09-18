@@ -26,6 +26,25 @@ interface IProject {
 	links: ILink[];
 }
 
+function stringToSlug(str: string) {
+	str = str.replace(/^\s+|\s+$/g, ""); // trim
+	str = str.toLowerCase();
+
+	// remove accents, swap ñ for n, etc
+	var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+	var to = "aaaaeeeeiiiioooouuuunc------";
+	for (var i = 0, l = from.length; i < l; i++) {
+		str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
+	}
+
+	str = str
+		.replace(/[^a-z0-9 -]/g, "") // remove invalid chars
+		.replace(/\s+/g, "-") // collapse whitespace and replace by -
+		.replace(/-+/g, "-"); // collapse dashes
+
+	return str;
+}
+
 export default async (req: NowRequest, res: NowResponse) => {
 	await cors(req, res);
 
@@ -73,7 +92,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 		}
 
 		if (req.method == "POST") {
-			const { name, description, slug, links } = req.body;
+			const { name, description, links } = req.body;
+			const slug = stringToSlug(name);
 			const { ops } = await projectsCollection.insertOne({
 				name,
 				description,
@@ -81,10 +101,13 @@ export default async (req: NowRequest, res: NowResponse) => {
 				links: links || [],
 			});
 			const id = ops[0]._id.toHexString();
-
 			return res.json({ id });
 		}
 	} catch (err) {
-		return res.status(400).json({ err });
+		if (err.code === 11000 && err.keyPattern.slug === 1)
+			return res
+				.status(400)
+				.json({ message: "Já existe um projeto com este nome cadastrado." });
+		return res.status(400).json(err);
 	}
 };

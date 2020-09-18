@@ -23,14 +23,14 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 	const db = await connectToDatabase();
 
-	const collection = db.collection("users");
+	const userCollection = db.collection("users");
 
-	const user = await collection.findOne({ email });
+	const user = await userCollection.findOne({ email });
 
 	if (email === process.env.ADMIN_EMAIL && !user) {
 		const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 5);
-		await collection.createIndex("email", { unique: true });
-		const { ops } = await collection.insertOne({
+		await userCollection.createIndex("email", { unique: true });
+		const { ops } = await userCollection.insertOne({
 			name: "Administrador",
 			email,
 			password: hash,
@@ -40,7 +40,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 		const id = ops[0]["_id"];
 		const token = jwt.sign({ id }, process.env.TOKEN_SECRET as string);
-
+		await db.collection("projects").createIndex("slug", { unique: true });
 		return res.json({ token });
 	}
 
