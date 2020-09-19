@@ -51,5 +51,6 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 	const id = user["_id"];
 	const token = jwt.sign({ id }, process.env.TOKEN_SECRET as string);
-	return res.json({ token });
+	const userName = user.name;
+	return res.json({ token, userName });
 };

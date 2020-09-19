@@ -1,47 +1,32 @@
 import Head from "next/head";
 import Router from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import { Grid, Flex, Text } from "@chakra-ui/core";
 import Input from "../components/Input";
 import Divider from "../components/Divider";
+import { UserContext } from "./_app";
 
 export default function Home() {
 	const [statusMessage, setStatusMessage] = useState(
 		"Faça seu login na plataforma"
 	);
 	const [statusMessageColor, setStatusMessageColor] = useState("white");
-	const [loading, setLoading] = useState(true);
-	useEffect(() => {
-		verifyToken();
-		async function verifyToken() {
-			try {
-				const token = localStorage.getItem("token");
-				if (token) {
-					const { data } = await axios.post("/api/validate_token", null, {
-						headers: { Authorization: token },
-					});
-					if (data.pass) {
-						Router.push("/admin");
-					}
-				}
-			} catch (err) {
-			} finally {
-				setLoading(false);
-			}
-		}
-	}, []);
+	const userInfo = useContext(UserContext);
+
 	async function handleSubmitForm(event) {
 		event.preventDefault();
 		const form = event.target;
 		const email = form.querySelector("input[type=email]").value;
 		const password = form.querySelector("input[type=password]").value;
 		try {
-			const { token } = (
+			const { token, userName } = (
 				await axios.post("/api/login", { email, password })
 			).data;
 			if (token) {
 				localStorage.setItem("token", token);
+				userInfo.token = token;
+				userInfo.name = userName;
 				Router.push("/admin");
 			}
 		} catch (err) {
@@ -49,17 +34,6 @@ export default function Home() {
 			setStatusMessageColor("red.400");
 		}
 	}
-
-	if (loading)
-		return (
-			<Flex
-				height="100vh"
-				width="100vw"
-				justifyContent="center"
-				alignItems="center">
-				<Text fontSize="lg">Carregando...</Text>
-			</Flex>
-		);
 
 	return (
 		<div>
