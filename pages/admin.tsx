@@ -11,6 +11,8 @@ import {
 import { useContext } from "react";
 import { UserContext } from "./_app";
 import Router from "next/router";
+import Users from "../components/Users";
+import Projects from "../components/Projects";
 
 const Admin = () => {
 	const { token, name } = useContext(UserContext);
@@ -39,14 +41,14 @@ const Admin = () => {
 				</Flex>
 				<TabList>
 					<Tab>Projetos</Tab>
-					<Tab>Usuários</Tab>
+					<Tab>Criar novo usuário</Tab>
 				</TabList>
 				<TabPanels>
 					<TabPanel>
-						<p>one!</p>
+						<Projects />
 					</TabPanel>
 					<TabPanel>
-						<p>two!</p>
+						<Users />
 					</TabPanel>
 				</TabPanels>
 			</Tabs>
