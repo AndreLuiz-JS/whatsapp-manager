@@ -8,9 +8,13 @@
 		"start": "next start"
 	},
 	"dependencies": {
+		"@chakra-ui/core": "^0.8.0",
+		"@emotion/core": "^10.0.35",
+		"@emotion/styled": "^10.0.27",
 		"axios": "^0.20.0",
 		"bcrypt": "^5.0.0",
 		"cors": "^2.8.5",
+		"emotion-theming": "^10.0.27",
 		"jsonwebtoken": "^8.5.1",
 		"mongodb": "^3.6.2",
 		"next": "9.5.2",
