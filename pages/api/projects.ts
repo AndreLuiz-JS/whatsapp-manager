@@ -101,13 +101,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 				links: links || [],
 			});
 			const id = ops[0]._id.toHexString();
-			return res.json({ id });
+			return res.json({ id, slug });
 		}
 	} catch (err) {
-		if (err.code === 11000 && err.keyPattern.slug === 1)
-			return res
-				.status(400)
-				.json({ message: "Já existe um projeto com este nome cadastrado." });
 		return res.status(400).json(err);
 	}
 };
