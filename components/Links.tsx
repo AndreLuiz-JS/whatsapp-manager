@@ -53,6 +53,7 @@ const Links: React.FC = () => {
 		try {
 			const { data } = await axios.get("/api/projects", headers);
 			setProjects(data);
+			if (!selectedProject.id) setSelectedProject(data[0]);
 			const projectToSelect = data.find(
 				(project) => selectedProject.id == project.id
 			);
@@ -267,17 +268,7 @@ const Links: React.FC = () => {
 										projects[event.target.selectedIndex].links[0]
 									);
 									setSelectedProject(projects[event.target.selectedIndex]);
-									const linkSelect = document.querySelector(
-										"#selectLinkId"
-									) as HTMLSelectElement;
-									linkSelect.selectedIndex = 0;
-									setSelectedLink({
-										_id: "",
-										name: "",
-										link: "",
-										active: false,
-										numLeads: "",
-									});
+									unselectLink();
 									setReadOnlyForm(!hasLinks);
 								}}>
 								{projects.map((project, i) => (
