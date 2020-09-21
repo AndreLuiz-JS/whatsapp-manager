@@ -185,19 +185,19 @@ export default async (req: NowRequest, res: NowResponse) => {
 		/* apagar link*/
 		if (req.method == "DELETE") {
 			/* Verificação do ID */
-			const { id } = req.body;
+			const { id } = req.query;
 			if (!id)
 				return res.status(400).json({
-					message: "Deve ser informado o id do projeto na variável projectID.",
+					message: "Deve ser informado o id do projeto na query url",
 				});
 
-			if (!ObjectId.isValid(id))
+			if (!ObjectId.isValid(id.toString()))
 				return res.status(400).json({
 					message:
 						"O projectID precisa ser uma número hexadecimal com 24 caracteres.",
 				});
 			/* */
-			const _id = new ObjectId(id);
+			const _id = new ObjectId(id.toString());
 			const response = await projectsCollection.updateOne(
 				{
 					links: { $elemMatch: { _id } },
@@ -211,6 +211,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 		}
 		/**/
 	} catch (err) {
+		console.log(err);
 		if (err.code === 11000)
 			return res.status(400).json({ message: "Este link já existe" });
 

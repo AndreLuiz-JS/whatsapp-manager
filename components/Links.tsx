@@ -8,6 +8,7 @@ import {
 	Grid,
 	InputGroup,
 	Input,
+	Button,
 	InputLeftAddon,
 	Text,
 	Select,
@@ -44,14 +45,21 @@ const Links: React.FC = () => {
 	const [selectedLink, setSelectedLink] = useState({} as ILink);
 	const [readOnlyForm, setReadOnlyForm] = useState(true);
 	const headers = { headers: { Authorization: token } };
-	const [refresh, setRefresh] = useContext(RefreshProjects);
+	const { refreshProjectsContext, setRefreshProjectsContext } = useContext(
+		RefreshProjects
+	);
 
 	async function refreshProjects() {
 		try {
 			const { data } = await axios.get("/api/projects", headers);
 			setProjects(data);
-			setSelectedProject(data[0]);
-			setReadOnlyForm(!data[0].links[0]);
+			const projectToSelect = data.find(
+				(project) => selectedProject.id == project.id
+			);
+			if (projectToSelect) {
+				setSelectedProject(projectToSelect);
+			}
+			unselectLink();
 		} catch (error) {
 			console.log(error);
 		}
@@ -72,7 +80,7 @@ const Links: React.FC = () => {
 				setMessage(
 					`Link ${name} (${link}) criado com sucesso.\nID do link: ${data.id}`
 				);
-			setRefresh(!refresh);
+			setRefreshProjectsContext(!refreshProjectsContext);
 			form.name.value = "";
 			form.link.value = "";
 			form.numLeads.value = "";
@@ -97,7 +105,8 @@ const Links: React.FC = () => {
 			const { data } = await axios.patch("/api/links", formData, headers);
 			if (data.updated) {
 				setMessage(`Link ${name} (${link}) alterado com sucesso.`);
-				setRefresh(!refresh);
+				setRefreshProjectsContext(!refreshProjectsContext);
+				unselectLink();
 			} else {
 				setMessage("Link não atualizado.");
 			}
@@ -109,9 +118,52 @@ const Links: React.FC = () => {
 		}
 	}
 
+	async function handleDeleteLink() {
+		if (
+			selectedLink._id !== "" &&
+			window.confirm(
+				`Deseja realmente apagar o link ${selectedLink.name}(${selectedLink.link})`
+			)
+		)
+			try {
+				const { data } = await axios.delete(
+					`/api/links?id=${selectedLink._id}`,
+					headers
+				);
+				if (data.updated) {
+					setMessage(
+						`Link ${selectedLink.name} (${selectedLink.link}) apagado com sucesso.`
+					);
+					setRefreshProjectsContext(!refreshProjectsContext);
+					unselectLink();
+				} else {
+					setMessage("Link não atualizado.");
+				}
+			} catch (error) {
+				setMessage(
+					error.response.data.message ||
+						"Não foi possível atualizar o link no momento, tente novamente em alguns instantes."
+				);
+			}
+	}
+
+	function unselectLink() {
+		const linkSelect = document.querySelector(
+			"#selectLinkId"
+		) as HTMLSelectElement;
+		linkSelect.selectedIndex = 0;
+		setSelectedLink({
+			_id: "",
+			name: "",
+			link: "",
+			active: false,
+			numLeads: "",
+		});
+	}
+
 	useEffect(() => {
 		refreshProjects();
-	}, [refresh]);
+	}, [refreshProjectsContext]);
 
 	useEffect(() => {
 		setMessagesArray(message.split("\n"));
@@ -136,7 +188,11 @@ const Links: React.FC = () => {
 						id="createLinkForm">
 						<InputGroup>
 							<InputLeftAddon children="Projeto" />
-							<Select variant="filled" color="gray.600" name="projectID">
+							<Select
+								variant="filled"
+								color="gray.600"
+								name="projectID"
+								isRequired>
 								{projects.map((project, i) => (
 									<option value={project.id} key={i}>
 										{project.name}
@@ -149,6 +205,7 @@ const Links: React.FC = () => {
 							<Input
 								placeholder="digite um nome para o novo link"
 								name="name"
+								isRequired
 							/>
 						</InputGroup>
 						<InputGroup>
@@ -210,6 +267,10 @@ const Links: React.FC = () => {
 										projects[event.target.selectedIndex].links[0]
 									);
 									setSelectedProject(projects[event.target.selectedIndex]);
+									const linkSelect = document.querySelector(
+										"#selectLinkId"
+									) as HTMLSelectElement;
+									linkSelect.selectedIndex = 0;
 									setSelectedLink({
 										_id: "",
 										name: "",
@@ -217,7 +278,6 @@ const Links: React.FC = () => {
 										active: false,
 										numLeads: "",
 									});
-									document.querySelector("#selectLinkId").selectedIndex = 0;
 									setReadOnlyForm(!hasLinks);
 								}}>
 								{projects.map((project, i) => (
@@ -231,7 +291,7 @@ const Links: React.FC = () => {
 							<InputLeftAddon children="Link" />
 							<Select
 								placeholder={
-									readOnlyForm && !selectedProject.links[0]
+									readOnlyForm && !selectedProject?.links[0]
 										? "nenhum link cadastrado neste projeto"
 										: "Selecione um link para alterar"
 								}
@@ -241,18 +301,8 @@ const Links: React.FC = () => {
 								id="selectLinkId"
 								onChange={(event) => {
 									const index = event.target.selectedIndex;
-									if (index === 0) {
-										setSelectedLink({
-											_id: "",
-											name: "",
-											link: "",
-											active: false,
-											numLeads: "",
-										});
-										setReadOnlyForm(true);
-									} else {
-										setSelectedLink(selectedProject.links[index - 1]);
-									}
+									setReadOnlyForm(index === 0);
+									setSelectedLink(selectedProject.links[index - 1]);
 								}}
 								isRequired>
 								{selectedProject.links?.map((link, i) => (
@@ -339,14 +389,25 @@ const Links: React.FC = () => {
 							isDisabled={readOnlyForm}>
 							Ativo
 						</Checkbox>
-						<Input
-							type="submit"
-							backgroundColor="blue.500"
-							_hover={{ backgroundColor: "blue.600" }}
-							value="ATUALIZAR"
-							maxWidth="50%"
-							margin="0 auto"
-						/>
+						<InputGroup>
+							<Input
+								type="submit"
+								backgroundColor="blue.500"
+								_hover={{ backgroundColor: "blue.600" }}
+								value="ATUALIZAR"
+								maxWidth="50%"
+								margin="0 auto"
+							/>
+							<Button
+								backgroundColor="red.500"
+								_hover={{ backgroundColor: "red.600" }}
+								children="APAGAR"
+								maxWidth="150px"
+								margin="0 auto"
+								onClick={handleDeleteLink}
+								isDisabled={readOnlyForm}
+							/>
+						</InputGroup>
 					</Grid>
 				</AccordionPanel>
 			</AccordionItem>

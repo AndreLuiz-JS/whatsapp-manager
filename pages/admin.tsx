@@ -21,14 +21,14 @@ import NewUser from "../components/NewUser";
 import NewProject from "../components/NewProject";
 import Links from "../components/Links";
 
-export const RefreshProjects = createContext([
-	true,
-	function (boolean) {} as Dispatch<SetStateAction<boolean>>,
-]);
+export const RefreshProjects = createContext({
+	refreshProjectsContext: true,
+	setRefreshProjectsContext: (S: boolean) => {},
+});
 
 const Admin = () => {
 	const { token, name } = useContext(UserContext);
-	const refreshProjects = useState(true);
+	const [refreshProjectsContext, setRefreshProjectsContext] = useState(true);
 	return (
 		<>
 			<Head>
@@ -57,7 +57,8 @@ const Admin = () => {
 					<Tab>Novo Projeto</Tab>
 					<Tab>Novo usuário</Tab>
 				</TabList>
-				<RefreshProjects.Provider value={refreshProjects}>
+				<RefreshProjects.Provider
+					value={{ refreshProjectsContext, setRefreshProjectsContext }}>
 					<TabPanels>
 						<TabPanel>
 							<Links />

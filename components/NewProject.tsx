@@ -6,7 +6,9 @@ import { RefreshProjects } from "../pages/admin";
 const Projects: React.FC = () => {
 	const [message, setMessage] = useState("");
 	const { token } = useContext(UserContext);
-	const [refreshProjects, setRefreshProjects] = useContext(RefreshProjects);
+	const { refreshProjectsContext, setRefreshProjectsContext } = useContext(
+		RefreshProjects
+	);
 	const [messagesArray, setMessagesArray] = useState([] as string[]);
 
 	async function handleSubmitForm(event) {
@@ -24,19 +26,20 @@ const Projects: React.FC = () => {
 				setMessage(
 					`Projeto ${name} (${description}) criado com sucesso.\nID do projeto: ${data.id}\nSlug do projeto: ${data.slug}`
 				);
-				setRefreshProjects(!refreshProjects);
+				setRefreshProjectsContext(!refreshProjectsContext);
 			}
 		} catch (error) {
-			if (error.response.data.code == 11000) {
-				setMessage(
-					`Projeto com o nome ${name} já está cadastrado, utilize outro nome de projeto`
-				);
-				form.name.value = "";
-			} else {
-				setMessage(
-					"Não foi possível criar o usuário no momento, tente novamente em alguns instantes."
-				);
-			}
+			if (error.response)
+				if (error.response.data.code == 11000) {
+					setMessage(
+						`Projeto com o nome ${name} já está cadastrado, utilize outro nome de projeto`
+					);
+					form.name.value = "";
+				} else {
+					setMessage(
+						"Não foi possível criar o usuário no momento, tente novamente em alguns instantes."
+					);
+				}
 		}
 	}
 
