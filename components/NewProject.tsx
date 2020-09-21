@@ -1,10 +1,28 @@
-import { Grid, InputGroup, Input, InputLeftAddon, Text } from "@chakra-ui/core";
+import {
+	Grid,
+	InputGroup,
+	Input,
+	InputLeftAddon,
+	Text,
+	Flex,
+} from "@chakra-ui/core";
 import axios from "axios";
 import { useState, useContext, useEffect } from "react";
 import { UserContext } from "../pages/_app";
 import { RefreshProjects } from "../pages/admin";
+import { ILink } from "./Links";
+
+export interface IProject {
+	id: string;
+	name: string;
+	description: string;
+	slug: string;
+	links: ILink[];
+}
+
 const Projects: React.FC = () => {
 	const [message, setMessage] = useState("");
+	const [projects, setProjects] = useState([{}] as IProject[]);
 	const { token } = useContext(UserContext);
 	const { refreshProjectsContext, setRefreshProjectsContext } = useContext(
 		RefreshProjects
@@ -43,47 +61,81 @@ const Projects: React.FC = () => {
 		}
 	}
 
+	async function refreshProjects() {
+		try {
+			const { data } = await axios.get("/api/projects", {
+				headers: { Authorization: token },
+			});
+
+			if (data) setProjects(data);
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	useEffect(() => {
+		refreshProjects();
+	}, [refreshProjectsContext]);
+
 	useEffect(() => {
 		setMessagesArray(message.split("\n"));
 	}, [message]);
 
 	return (
-		<Grid
-			as="form"
-			margin="64px auto"
-			gap="16px"
-			maxWidth="480px"
-			onSubmit={handleSubmitForm}>
-			<InputGroup>
-				<InputLeftAddon children="Nome" />
+		<>
+			<Grid
+				as="form"
+				margin="64px auto"
+				gap="16px"
+				maxWidth="480px"
+				onSubmit={handleSubmitForm}>
+				<InputGroup>
+					<InputLeftAddon children="Nome" />
+					<Input
+						placeholder="digite um nome para o novo projeto"
+						name="name"
+						isRequired
+					/>
+				</InputGroup>
+				<InputGroup>
+					<InputLeftAddon children="Descrição" />
+					<Input
+						placeholder="uma breve descrição"
+						name="description"
+						isRequired
+					/>
+				</InputGroup>
 				<Input
-					placeholder="digite um nome para o novo projeto"
-					name="name"
-					isRequired
+					type="submit"
+					backgroundColor="blue.500"
+					_hover={{ backgroundColor: "blue.600" }}
+					value="CADASTRAR"
+					maxWidth="50%"
+					margin="0 auto"
 				/>
-			</InputGroup>
-			<InputGroup>
-				<InputLeftAddon children="Descrição" />
-				<Input
-					placeholder="uma breve descrição"
-					name="description"
-					isRequired
-				/>
-			</InputGroup>
-			<Input
-				type="submit"
-				backgroundColor="blue.500"
-				_hover={{ backgroundColor: "blue.600" }}
-				value="CADASTRAR"
-				maxWidth="50%"
-				margin="0 auto"
-			/>
-			{messagesArray.map((message, i) => (
-				<Text textAlign="center" key={i}>
-					{message}
-				</Text>
-			))}
-		</Grid>
+				{messagesArray.map((message, i) => (
+					<Text textAlign="center" key={i}>
+						{message}
+					</Text>
+				))}
+			</Grid>
+			<Grid marginTop="10px" gridTemplateColumns="1fr 1fr 1fr 1fr">
+				<Text fontWeight="bold">Projeto</Text>
+				<Text>Descrição</Text>
+				<Text>Slug</Text>
+				<Text>Nº Links</Text>
+				{projects.map((project) => (
+					<>
+						<Text padding="8px" borderTop="solid 1px white">
+							{project.name}
+						</Text>
+						<Text borderTop="solid 1px white">{project.description}</Text>
+						<Text borderTop="solid 1px white">{project.slug}</Text>
+						<Text borderTop="solid 1px white">{project.links.length}</Text>
+					</>
+				))}
+			</Grid>
+		</>
 	);
 };
 
