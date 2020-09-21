@@ -53,7 +53,11 @@ const Links: React.FC = () => {
 		try {
 			const { data } = await axios.get("/api/projects", headers);
 			setProjects(data);
-			if (!selectedProject.id) setSelectedProject(data[0]);
+			if (!selectedProject.id) {
+				setSelectedProject(data[0]);
+				const hasLinks = Boolean(data[0].links[0]);
+				setReadOnlyForm(!hasLinks);
+			}
 			const projectToSelect = data.find(
 				(project) => selectedProject.id == project.id
 			);
