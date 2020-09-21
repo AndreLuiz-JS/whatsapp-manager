@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import {
 	Grid,
 	InputGroup,
@@ -119,20 +120,26 @@ const Projects: React.FC = () => {
 					</Text>
 				))}
 			</Grid>
-			<Grid marginTop="10px" gridTemplateColumns="1fr 1fr 1fr 1fr">
+			<Grid marginTop="10px" gridTemplateColumns="2fr 6fr 2fr 1fr">
 				<Text fontWeight="bold">Projeto</Text>
 				<Text>Descrição</Text>
 				<Text>Slug</Text>
 				<Text>Nº Links</Text>
-				{projects.map((project) => (
-					<>
+				{projects.map((project, i) => (
+					<Fragment key={i}>
 						<Text padding="8px" borderTop="solid 1px white">
 							{project.name}
 						</Text>
-						<Text borderTop="solid 1px white">{project.description}</Text>
-						<Text borderTop="solid 1px white">{project.slug}</Text>
-						<Text borderTop="solid 1px white">{project.links.length}</Text>
-					</>
+						<Text padding="8px" borderTop="solid 1px white">
+							{project.description}
+						</Text>
+						<Text padding="8px" borderTop="solid 1px white">
+							{project.slug}
+						</Text>
+						<Text padding="8px" borderTop="solid 1px white">
+							{project.links?.length}
+						</Text>
+					</Fragment>
 				))}
 			</Grid>
 		</>
