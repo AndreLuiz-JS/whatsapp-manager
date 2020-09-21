@@ -40,7 +40,13 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 		const id = ops[0]["_id"];
 		const token = jwt.sign({ id }, process.env.TOKEN_SECRET as string);
-		await db.collection("projects").createIndex("slug", { unique: true });
+		await db.collection("projects").createIndex({ slug: 1 }, { unique: true });
+		await db
+			.collection("projects")
+			.createIndex({ "links._id": 1 }, { unique: true });
+		await db
+			.collection("projects")
+			.createIndex({ "links.link": 1 }, { unique: true });
 		return res.json({ token });
 	}
 

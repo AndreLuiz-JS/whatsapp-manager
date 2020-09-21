@@ -2,9 +2,11 @@ import { Grid, InputGroup, Input, InputLeftAddon, Text } from "@chakra-ui/core";
 import axios from "axios";
 import { useState, useContext, useEffect } from "react";
 import { UserContext } from "../pages/_app";
+import { RefreshProjects } from "../pages/admin";
 const Projects: React.FC = () => {
 	const [message, setMessage] = useState("");
 	const { token } = useContext(UserContext);
+	const [refreshProjects, setRefreshProjects] = useContext(RefreshProjects);
 	const [messagesArray, setMessagesArray] = useState([] as string[]);
 
 	async function handleSubmitForm(event) {
@@ -18,10 +20,12 @@ const Projects: React.FC = () => {
 				{ name, description, links: [] },
 				{ headers: { Authorization: token } }
 			);
-			if (data.id)
+			if (data.id) {
 				setMessage(
 					`Projeto ${name} (${description}) criado com sucesso.\nID do projeto: ${data.id}\nSlug do projeto: ${data.slug}`
 				);
+				setRefreshProjects(!refreshProjects);
+			}
 		} catch (error) {
 			if (error.response.data.code == 11000) {
 				setMessage(
@@ -71,8 +75,10 @@ const Projects: React.FC = () => {
 				maxWidth="50%"
 				margin="0 auto"
 			/>
-			{messagesArray.map((message) => (
-				<Text textAlign="center">{message}</Text>
+			{messagesArray.map((message, i) => (
+				<Text textAlign="center" key={i}>
+					{message}
+				</Text>
 			))}
 		</Grid>
 	);

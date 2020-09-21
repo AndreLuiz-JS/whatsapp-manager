@@ -147,7 +147,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 			const { id, name, link, active, numLeads } = req.body;
 			if (!id)
 				return res.status(400).json({
-					message: "Deve ser informado o id do projeto na variável projectID.",
+					message: "Deve ser informado o id do link na variável id.",
 				});
 
 			if (isNaN(Number(numLeads)) || numLeads > 257 || numLeads < 0)
@@ -168,9 +168,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 				"links.$.numLeads": Number(numLeads),
 			};
 			for (const key of Object.keys(updateObject)) {
-				if (!updateObject[key] === false) delete updateObject[key];
+				if (updateObject[key] === undefined) delete updateObject[key];
 			}
-			console.log(updateObject);
 			const response = await projectsCollection.updateOne(
 				{
 					links: { $elemMatch: { _id } },
@@ -212,7 +211,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 		}
 		/**/
 	} catch (err) {
-		console.log(err);
+		if (err.code === 11000)
+			return res.status(400).json({ message: "Este link já existe" });
+
 		return res.status(400).json(err);
 	}
 };

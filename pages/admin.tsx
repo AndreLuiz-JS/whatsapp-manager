@@ -8,14 +8,27 @@ import {
 	Flex,
 	Link,
 } from "@chakra-ui/core";
-import { useContext } from "react";
+import {
+	useContext,
+	createContext,
+	useState,
+	Dispatch,
+	SetStateAction,
+} from "react";
 import { UserContext } from "./_app";
 import Router from "next/router";
 import NewUser from "../components/NewUser";
 import NewProject from "../components/NewProject";
+import Links from "../components/Links";
+
+export const RefreshProjects = createContext([
+	true,
+	function (boolean) {} as Dispatch<SetStateAction<boolean>>,
+]);
 
 const Admin = () => {
 	const { token, name } = useContext(UserContext);
+	const refreshProjects = useState(true);
 	return (
 		<>
 			<Head>
@@ -40,17 +53,23 @@ const Admin = () => {
 					)
 				</Flex>
 				<TabList>
+					<Tab>Links</Tab>
 					<Tab>Novo Projeto</Tab>
 					<Tab>Novo usuário</Tab>
 				</TabList>
-				<TabPanels>
-					<TabPanel>
-						<NewProject />
-					</TabPanel>
-					<TabPanel>
-						<NewUser />
-					</TabPanel>
-				</TabPanels>
+				<RefreshProjects.Provider value={refreshProjects}>
+					<TabPanels>
+						<TabPanel>
+							<Links />
+						</TabPanel>
+						<TabPanel>
+							<NewProject />
+						</TabPanel>
+						<TabPanel>
+							<NewUser />
+						</TabPanel>
+					</TabPanels>
+				</RefreshProjects.Provider>
 			</Tabs>
 		</>
 	);
