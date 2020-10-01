@@ -23,6 +23,9 @@ export interface IProject {
 	name: string;
 	description: string;
 	slug: string;
+	trackerGoogleAnalytics?: string;
+	trackerGoogleAds?: string;
+	trackerFacebook?: string;
 	links: ILink[];
 }
 

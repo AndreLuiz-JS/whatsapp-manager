@@ -36,7 +36,6 @@ export const RefreshProjects = createContext({
 export const UserContext = createContext({} as IUser);
 
 const Admin = () => {
-	const { token, name } = useContext(UserContext);
 	const [refreshProjectsContext, setRefreshProjectsContext] = useState(true);
 	const [loading, setLoading] = useState(true);
 	const [userInfo, setUserInfo] = useState({} as IUser);
@@ -51,7 +50,6 @@ const Admin = () => {
 					});
 					if (data.pass) {
 						setUserInfo({ token, name: data.userName });
-						await Router.push("/admin");
 					}
 				} else {
 					await Router.push("/");
@@ -78,7 +76,7 @@ const Admin = () => {
 				margin="10px auto"
 				position="relative">
 				<Flex position="absolute" right="0" top="10px">
-					{name} (
+					{userInfo.name} (
 					<Link
 						href="#"
 						onClick={() => {
