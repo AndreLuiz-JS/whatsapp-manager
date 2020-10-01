@@ -10,27 +10,64 @@ import {
 } from "@chakra-ui/core";
 import {
 	useContext,
+	useEffect,
 	createContext,
 	useState,
 	Dispatch,
 	SetStateAction,
 } from "react";
-import { UserContext } from "./_app";
+import axios from "axios";
 import Router from "next/router";
 import NewUser from "../components/NewUser";
 import NewProject from "../components/NewProject";
 import Links from "../components/Links";
+import Loading from "../components/Loading";
+
+interface IUser {
+	token: string;
+	name: string;
+}
 
 export const RefreshProjects = createContext({
 	refreshProjectsContext: true,
 	setRefreshProjectsContext: (S: boolean) => {},
 });
 
+export const UserContext = createContext({} as IUser);
+
 const Admin = () => {
 	const { token, name } = useContext(UserContext);
 	const [refreshProjectsContext, setRefreshProjectsContext] = useState(true);
+	const [loading, setLoading] = useState(true);
+	const [userInfo, setUserInfo] = useState({} as IUser);
+	useEffect(() => {
+		verifyToken();
+		async function verifyToken() {
+			try {
+				const token = localStorage.getItem("token");
+				if (token) {
+					const { data } = await axios.post("/api/validate_token", null, {
+						headers: { Authorization: token },
+					});
+					if (data.pass) {
+						setUserInfo({ token, name: data.userName });
+						await Router.push("/admin");
+					}
+				} else {
+					await Router.push("/");
+				}
+			} catch (err) {
+				localStorage.removeItem("token");
+				await Router.push("/");
+			} finally {
+				setLoading(false);
+			}
+		}
+	}, []);
+
+	if (loading) return <Loading />;
 	return (
-		<>
+		<UserContext.Provider value={userInfo}>
 			<Head>
 				<title>Gerenciador de Grupos do Whatsapp</title>
 				<link rel="icon" href="/favicon.ico" />
@@ -72,7 +109,7 @@ const Admin = () => {
 					</TabPanels>
 				</RefreshProjects.Provider>
 			</Tabs>
-		</>
+		</UserContext.Provider>
 	);
 };
 export default Admin;

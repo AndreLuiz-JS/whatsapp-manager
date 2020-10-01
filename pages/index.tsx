@@ -5,7 +5,7 @@ import axios from "axios";
 import { Grid, Flex, Text } from "@chakra-ui/core";
 import Input from "../components/Input";
 import Divider from "../components/Divider";
-import { UserContext } from "./_app";
+import { UserContext } from "./admin";
 
 export default function Home() {
 	const [statusMessage, setStatusMessage] = useState(

@@ -59,26 +59,20 @@ export default async (req: NowRequest, res: NowResponse) => {
 							"O id precisa ser uma número hexadecimal com 24 caracteres.",
 					});
 				/* */
-				/*link aleatório por Projeto*/
-				const _id = new ObjectId(req.body.projectID);
-				if (req.body.random) {
-					const project: IProject | null = await projectsCollection.findOne({
-						_id,
-					});
-					const links = project?.links.filter((link) => link.active == true);
-					if (!links)
-						return res.json({ message: "Nenhum link ativo neste projeto." });
-					const iRandom = Math.floor(Math.random() * links.length);
-					return res.json(links[iRandom]);
-				}
-				/**/
 				/* Todos os links por projeto*/
+				const _id = new ObjectId(req.body.projectID);
 				const project = await projectsCollection.findOne(
 					{
 						_id,
 					},
 					{ projection: { links: true, _id: false } }
 				);
+				if (!project)
+					return res
+						.status(404)
+						.json({
+							message: "Nenhum projeto encontrado como id especificado.",
+						});
 				return res.json(project.links);
 				/**/
 			}

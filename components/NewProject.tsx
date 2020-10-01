@@ -9,8 +9,7 @@ import {
 } from "@chakra-ui/core";
 import axios from "axios";
 import { useState, useContext, useEffect } from "react";
-import { UserContext } from "../pages/_app";
-import { RefreshProjects } from "../pages/admin";
+import { RefreshProjects, UserContext } from "../pages/admin";
 import { ILink } from "./Links";
 
 export interface IProject {

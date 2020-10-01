@@ -10,7 +10,7 @@ const cors = initMiddleware(
 		methods: ["POST", "GET"],
 	})
 );
-interface ILink {
+export interface ILink {
 	_id: ObjectId;
 	name: string;
 	link: string;
@@ -18,7 +18,7 @@ interface ILink {
 	numLeads: number;
 }
 
-interface IProject {
+export interface IProject {
 	_id: ObjectId;
 	name: string;
 	description: string;

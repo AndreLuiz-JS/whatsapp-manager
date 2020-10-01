@@ -1,7 +1,7 @@
 import { Grid, Input, Text } from "@chakra-ui/core";
 import axios from "axios";
 import { useState, useContext } from "react";
-import { UserContext } from "../pages/_app";
+import { UserContext } from "../pages/admin";
 const Users: React.FC = () => {
 	const [message, setMessage] = useState("");
 	const { token } = useContext(UserContext);
