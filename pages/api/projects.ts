@@ -95,12 +95,23 @@ export default async (req: NowRequest, res: NowResponse) => {
 		}
 
 		if (req.method == "POST") {
-			const { name, description, links } = req.body;
+			const {
+				name,
+				description,
+				links,
+				trackerGoogleAnalytics,
+				trackerGoogleAds,
+				trackerFacebook,
+			} = req.body;
+			console.log(req.body);
 			const slug = stringToSlug(name);
 			const { ops } = await projectsCollection.insertOne({
 				name,
 				description,
 				slug,
+				trackerGoogleAnalytics,
+				trackerGoogleAds,
+				trackerFacebook,
 				links: links || [],
 			});
 			const id = ops[0]._id.toHexString();

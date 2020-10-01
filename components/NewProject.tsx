@@ -34,10 +34,20 @@ const Projects: React.FC = () => {
 		const form = event.target;
 		const name = form.name.value;
 		const description = form.description.value;
+		const trackerGoogleAnalytics = form.trackerGoogleAnalytics.value;
+		const trackerGoogleAds = form.trackerGoogleAds.value;
+		const trackerFacebook = form.trackerFacebook.value;
 		try {
 			const { data } = await axios.post(
 				"/api/projects",
-				{ name, description, links: [] },
+				{
+					name,
+					description,
+					trackerGoogleAnalytics,
+					trackerGoogleAds,
+					trackerFacebook,
+					links: [],
+				},
 				{ headers: { Authorization: token } }
 			);
 			if (data.id) {
@@ -105,6 +115,34 @@ const Projects: React.FC = () => {
 						isRequired
 					/>
 				</InputGroup>
+				<Grid gap="8px 0">
+					<Text>Trackers</Text>
+					<InputGroup>
+						<InputLeftAddon children="Google Analytics" />
+						<Input
+							placeholder="id do Google Analytics tracker"
+							name="trackerGoogleAnalytics"
+							isRequired
+						/>
+					</InputGroup>
+					<InputGroup>
+						<InputLeftAddon children="Google Ads" />
+						<Input
+							placeholder="id do Google Ads tracker"
+							name="trackerGoogleAds"
+							isRequired
+						/>
+					</InputGroup>
+					<InputGroup>
+						<InputLeftAddon children="Facebook (pixel)" />
+						<Input
+							placeholder="id do Facebook tracker"
+							name="trackerFacebook"
+							isRequired
+						/>
+					</InputGroup>
+				</Grid>
+
 				<Input
 					type="submit"
 					backgroundColor="blue.500"
