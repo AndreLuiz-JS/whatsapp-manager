@@ -8,6 +8,7 @@ export default function RandomLink() {
 	const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [message, setMessage] = useState("");
+	const [facebookPixelId, setFacebookPixelId] = useState("");
 	const { slug } = router.query;
 	useEffect(() => {
 		getLinkAndRedirect();
@@ -17,7 +18,6 @@ export default function RandomLink() {
 				setMessage("");
 				if (slug) {
 					const { data } = await axios.get(`/api/links/${slug}`);
-					console.log(data);
 					if (data.link) {
 						const link = data.link;
 						router.push(link);
@@ -37,7 +37,12 @@ export default function RandomLink() {
 			}
 		}
 	}, [slug]);
-	if (loading) return <Loading />;
+	if (loading)
+		return (
+			<>
+				<Loading />
+			</>
+		);
 	return (
 		<Flex
 			height="100vh"

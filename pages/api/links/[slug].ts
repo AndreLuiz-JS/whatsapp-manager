@@ -1,5 +1,4 @@
 import { NowRequest, NowResponse } from "@vercel/node";
-import { useRouter } from "next/router";
 import Cors from "cors";
 import initMiddleware from "../../../lib/init-middleware";
 import { connectToDatabase } from "../../../config/database";
