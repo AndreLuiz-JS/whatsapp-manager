@@ -1,11 +1,9 @@
 import Head from "next/head";
 interface IProps {
-    facebookPixelID:string;
+	facebookPixelID: string;
 }
-export default function FacebookTracker({facebookPixelID}:IProps){
-    return <Head>
-        <script>
-            !(function (f, b, e, v, n, t, s) {
+export default function FacebookTracker({ facebookPixelID }: IProps) {
+	const script = `!(function (f, b, e, v, n, t, s) {
                 if (f.fbq) return;
                 n = f.fbq = function () {
                     n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
@@ -21,11 +19,13 @@ export default function FacebookTracker({facebookPixelID}:IProps){
                 s = b.getElementsByTagName(e)[0];
                 s.parentNode.insertBefore(t, s);
             })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', {facebookPixelID});
-            fbq('trackCustom', 'Grupo Whatsapp');
-        </script>
-        <noscript>
-            <img height="1" width="1" src="https://www.facebook.com/tr?id={FacebookPixelID: String}&ev=PageView&noscript=1" />
-        </noscript>
-    </Head>
-  }
+            fbq('init', ${facebookPixelID});
+            fbq('trackCustom', 'Grupo Whatsapp');`;
+	const noScript = `<img height="1" width="1" src="https://www.facebook.com/tr?id=${facebookPixelID}&ev=PageView&noscript=1" />`;
+	return (
+		<Head>
+			<script dangerouslySetInnerHTML={{ __html: script }} />
+			<noscript dangerouslySetInnerHTML={{ __html: noScript }} />
+		</Head>
+	);
+}
