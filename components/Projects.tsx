@@ -32,7 +32,7 @@ export interface IProject {
 	links: ILink[];
 }
 
-const Projects: React.FC = () => {
+export default function Projects() {
 	const [message, setMessage] = useState("");
 	const [projects, setProjects] = useState([{}] as IProject[]);
 	const [selectedProject, setSelectedProject] = useState({} as IProject);
@@ -195,10 +195,23 @@ const Projects: React.FC = () => {
 												<Input value={link.numLeads} isReadOnly />
 											</InputGroup>
 											<Checkbox
-												isChecked={link.active}
+												isChecked={selectedProject.links[index].active}
 												name="active"
 												justifySelf="right"
 												children="ativo?"
+												id={selectedProject.links[index]._id}
+												onChange={(event) => {
+													const id = event.target.id;
+													const links = selectedProject.links.map((link) => {
+														if (link._id == id) {
+															const newLink = { ...link, active: !link.active };
+															return newLink;
+														} else {
+															return link;
+														}
+													});
+													setSelectedProject({ ...selectedProject, links });
+												}}
 											/>
 										</Fragment>
 									);
@@ -257,6 +270,4 @@ const Projects: React.FC = () => {
 			</Grid>
 		</>
 	);
-};
-
-export default Projects;
+}

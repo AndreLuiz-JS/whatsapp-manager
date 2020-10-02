@@ -368,7 +368,7 @@ const Links: React.FC = () => {
 						<Checkbox
 							name="active"
 							isChecked={selectedLink?.active}
-							onChange={(event) =>
+							onChange={() =>
 								setSelectedLink({
 									...selectedLink,
 									active: !selectedLink.active,
