@@ -17,7 +17,7 @@ import {
 import axios from "axios";
 import { useState, useContext, useEffect } from "react";
 import { RefreshProjects, UserContext } from "../pages/admin";
-import { IProject } from "./NewProject";
+import { IProject } from "./Projects";
 
 export interface ILink {
 	_id: string;

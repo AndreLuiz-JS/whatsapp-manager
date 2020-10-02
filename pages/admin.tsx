@@ -19,7 +19,7 @@ import {
 import axios from "axios";
 import Router from "next/router";
 import NewUser from "../components/NewUser";
-import NewProject from "../components/NewProject";
+import NewProject from "../components/Projects";
 import Links from "../components/Links";
 import Loading from "../components/Loading";
 
@@ -89,7 +89,7 @@ const Admin = () => {
 				</Flex>
 				<TabList>
 					<Tab>Links</Tab>
-					<Tab>Novo Projeto</Tab>
+					<Tab>Projetos</Tab>
 					<Tab>Novo usuário</Tab>
 				</TabList>
 				<RefreshProjects.Provider
