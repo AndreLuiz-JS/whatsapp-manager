@@ -29,11 +29,11 @@ export default async (req: NowRequest, res: NowResponse) => {
 		const collection = db.collection("users");
 		const user = await collection.findOne(
 			{ _id },
-			{ projection: { name: true } }
+			{ projection: { name: true, teams: true } }
 		);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
-
-		return res.json({ pass: true, userName: user.name });
+		const teams = user.teams?.filter((team) => team !== "adm") || [];
+		return res.json({ pass: true, userName: user.name, teams });
 	} catch (err) {
 		return res.status(403).json({ message: "Token inválida" });
 	}

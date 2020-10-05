@@ -26,6 +26,7 @@ export interface IProject {
 	trackerGoogleAnalytics?: string;
 	trackerGoogleAds?: string;
 	trackerFacebook?: string;
+	team: string;
 	links: ILink[];
 }
 
@@ -66,7 +67,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 		const usersCollection = db.collection("users");
 		const user = await usersCollection.findOne(
 			{ _id },
-			{ projection: { name: true } }
+			{ projection: { name: true, teams: true } }
 		);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
 
@@ -88,7 +89,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 				const id = project._id.toHexString();
 				const serializedProject = { id, ...project };
 				delete serializedProject["_id"];
-				projects.push(serializedProject);
+				if (user.teams?.includes(serializedProject.team || "adm"))
+					projects.push(serializedProject);
 			});
 
 			return res.json(projects);

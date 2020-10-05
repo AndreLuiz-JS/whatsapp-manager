@@ -29,6 +29,7 @@ export interface IProject {
 	trackerGoogleAnalytics?: string;
 	trackerGoogleAds?: string;
 	trackerFacebook?: string;
+	team: string;
 	links: ILink[];
 }
 
@@ -50,6 +51,7 @@ export default function Projects() {
 		const trackerGoogleAnalytics = form.trackerGoogleAnalytics.value;
 		const trackerGoogleAds = form.trackerGoogleAds.value;
 		const trackerFacebook = form.trackerFacebook.value;
+		const team = form.team.value;
 		try {
 			const { data } = await axios.post(
 				"/api/projects",
@@ -60,6 +62,7 @@ export default function Projects() {
 					trackerGoogleAds,
 					trackerFacebook,
 					links: [],
+					team,
 				},
 				{ headers: { Authorization: token } }
 			);
@@ -202,17 +205,19 @@ export default function Projects() {
 								</Select>
 							</InputGroup>
 							<ProjectFields
-								description={selectedProject.description}
-								name={selectedProject.name}
-								trackerFacebook={selectedProject.trackerFacebook}
-								trackerGoogleAnalytics={selectedProject.trackerGoogleAnalytics}
-								trackerGoogleAds={selectedProject.trackerGoogleAds}
+								description={selectedProject?.description}
+								name={selectedProject?.name}
+								trackerFacebook={selectedProject?.trackerFacebook}
+								trackerGoogleAnalytics={selectedProject?.trackerGoogleAnalytics}
+								trackerGoogleAds={selectedProject?.trackerGoogleAds}
+								team={selectedProject.team}
 								update={({
 									name,
 									description,
 									trackerFacebook,
 									trackerGoogleAnalytics,
 									trackerGoogleAds,
+									team,
 								}) => {
 									setSelectedProject({
 										...selectedProject,
@@ -221,12 +226,13 @@ export default function Projects() {
 										trackerFacebook,
 										trackerGoogleAds,
 										trackerGoogleAnalytics,
+										team,
 									});
 								}}
 							/>
 							<Text>Links</Text>
 							<Grid gridTemplateColumns="3fr 5fr 150px 150px" gap="8px">
-								{selectedProject.links?.map((link, index) => {
+								{selectedProject?.links?.map((link, index) => {
 									return (
 										<Fragment key={index}>
 											<InputGroup>
@@ -242,14 +248,14 @@ export default function Projects() {
 												<Input value={link.numLeads} isReadOnly />
 											</InputGroup>
 											<Checkbox
-												isChecked={selectedProject.links[index].active}
+												isChecked={selectedProject?.links[index].active}
 												name="active"
 												justifySelf="right"
 												children="ativo?"
-												id={selectedProject.links[index]._id}
+												id={selectedProject?.links[index]._id}
 												onChange={(event) => {
 													const id = event.target.id;
-													const links = selectedProject.links.map((link) => {
+													const links = selectedProject?.links.map((link) => {
 														if (link._id == id) {
 															const newLink = { ...link, active: !link.active };
 															return newLink;

@@ -34,7 +34,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 			name: "Administrador",
 			email,
 			password: hash,
-			teams: ["default"],
+			teams: ["adm"],
 		});
 		if (password !== process.env.ADMIN_PASSWORD)
 			return res.status(403).json({ message: "Senha incorreta" });
@@ -54,5 +54,6 @@ export default async (req: NowRequest, res: NowResponse) => {
 	const id = user["_id"];
 	const token = jwt.sign({ id }, process.env.TOKEN_SECRET as string);
 	const userName = user.name;
-	return res.json({ token, userName });
+	const teams = user.teams?.filter((team) => team !== "adm") || [];
+	return res.json({ token, userName, teams });
 };

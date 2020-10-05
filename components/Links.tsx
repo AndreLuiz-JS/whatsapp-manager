@@ -147,7 +147,7 @@ const Links: React.FC = () => {
 	}, [projects]);
 
 	useEffect(() => {
-		if (selectedProject.links.length > 0) {
+		if (selectedProject?.links?.length > 0) {
 			setSelectedLink(selectedProject.links[0]);
 		} else {
 			setSelectedLink({
@@ -293,7 +293,7 @@ const Links: React.FC = () => {
 									const index = event.target.selectedIndex;
 									setReadOnlyForm(index === 0);
 									if (index !== 0) {
-										setSelectedLink(selectedProject.links[index - 1]);
+										setSelectedLink(selectedProject?.links[index - 1]);
 									} else {
 										setSelectedLink({
 											_id: "",
@@ -305,7 +305,7 @@ const Links: React.FC = () => {
 									}
 								}}
 								isRequired>
-								{selectedProject.links?.map((link, i) => (
+								{selectedProject?.links?.map((link, i) => (
 									<option
 										value={link._id}
 										key={i}

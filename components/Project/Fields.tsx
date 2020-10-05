@@ -1,5 +1,13 @@
-import { InputGroup, InputLeftAddon, Input, Grid, Text } from "@chakra-ui/core";
-import { useEffect, useState } from "react";
+import {
+	InputGroup,
+	InputLeftAddon,
+	Input,
+	Grid,
+	Text,
+	Select,
+} from "@chakra-ui/core";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../../pages/admin";
 
 export interface IProjectFields {
 	name?: string;
@@ -8,6 +16,7 @@ export interface IProjectFields {
 	trackerGoogleAds?: string;
 	trackerFacebook?: string;
 	update?: Function;
+	team?: string;
 }
 
 export default function ProjectFields({
@@ -17,6 +26,7 @@ export default function ProjectFields({
 	trackerGoogleAds,
 	trackerFacebook,
 	update,
+	team,
 }: IProjectFields) {
 	const [projectValues, setProjectValues] = useState({
 		name,
@@ -24,7 +34,9 @@ export default function ProjectFields({
 		trackerFacebook,
 		trackerGoogleAds,
 		trackerGoogleAnalytics,
+		team,
 	} as IProjectFields);
+	const userContext = useContext(UserContext);
 
 	useEffect(() => {
 		setProjectValues({
@@ -33,6 +45,7 @@ export default function ProjectFields({
 			trackerFacebook: trackerFacebook || "",
 			trackerGoogleAds: trackerGoogleAds || "",
 			trackerGoogleAnalytics: trackerGoogleAnalytics || "",
+			team: team || "",
 		});
 	}, [
 		name,
@@ -118,6 +131,28 @@ export default function ProjectFields({
 							});
 						}}
 					/>
+				</InputGroup>
+				<InputGroup>
+					<InputLeftAddon children="Time" />
+					<Select
+						variant="filled"
+						color="gray.600"
+						placeholder="time responsável pelo projeto"
+						name="team"
+						value={projectValues.team}
+						isRequired
+						onChange={(event) => {
+							setProjectValues({
+								...projectValues,
+								team: event.target.value,
+							});
+						}}>
+						{userContext.teams.map((team, index) => (
+							<option key={index} selected={team == projectValues.team}>
+								{team}
+							</option>
+						))}
+					</Select>
 				</InputGroup>
 			</Grid>
 		</>

@@ -26,6 +26,7 @@ import Loading from "../components/Loading";
 interface IUser {
 	token: string;
 	name: string;
+	teams: string[];
 }
 
 export const RefreshProjects = createContext({
@@ -49,7 +50,11 @@ const Admin = () => {
 						headers: { Authorization: token },
 					});
 					if (data.pass) {
-						setUserInfo({ token, name: data.userName });
+						setUserInfo({
+							token,
+							name: data.userName,
+							teams: data.teams || [],
+						});
 					}
 				} else {
 					await Router.push("/");
