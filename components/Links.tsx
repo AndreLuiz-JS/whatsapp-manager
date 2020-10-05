@@ -33,7 +33,7 @@ const Links: React.FC = () => {
 	const [messagesArray, setMessagesArray] = useState([] as string[]);
 	const [projects, setProjects] = useState([{}] as IProject[]);
 	const [selectedProject, setSelectedProject] = useState({
-		links: [{ _id: "", name: "", link: "", active: false, numLeads: 0 }],
+		links: [] as ILink[],
 	} as IProject);
 	const [selectedLink, setSelectedLink] = useState({} as ILink);
 	const [readOnlyForm, setReadOnlyForm] = useState(true);
@@ -46,18 +46,6 @@ const Links: React.FC = () => {
 		try {
 			const { data } = await axios.get("/api/projects", headers);
 			setProjects(data);
-			if (!selectedProject.id) {
-				setSelectedProject(data[0]);
-				const hasLinks = Boolean(data[0].links[0]);
-				setReadOnlyForm(!hasLinks);
-			}
-			const projectToSelect = data.find(
-				(project) => selectedProject.id == project.id
-			);
-			if (projectToSelect) {
-				setSelectedProject(projectToSelect);
-			}
-			unselectLink();
 		} catch (error) {
 			console.log(error);
 		}
@@ -104,7 +92,6 @@ const Links: React.FC = () => {
 			if (data.updated) {
 				setMessage(`Link ${name} (${link}) alterado com sucesso.`);
 				setRefreshProjectsContext(!refreshProjectsContext);
-				unselectLink();
 			} else {
 				setMessage("Link não atualizado.");
 			}
@@ -133,7 +120,6 @@ const Links: React.FC = () => {
 						`Link ${selectedLink.name} (${selectedLink.link}) apagado com sucesso.`
 					);
 					setRefreshProjectsContext(!refreshProjectsContext);
-					unselectLink();
 				} else {
 					setMessage("Link não atualizado.");
 				}
@@ -145,23 +131,34 @@ const Links: React.FC = () => {
 			}
 	}
 
-	function unselectLink() {
-		const linkSelect = document.querySelector(
-			"#selectLinkId"
-		) as HTMLSelectElement;
-		linkSelect.selectedIndex = 0;
-		setSelectedLink({
-			_id: "",
-			name: "",
-			link: "",
-			active: false,
-			numLeads: "",
-		});
-	}
-
 	useEffect(() => {
 		refreshProjects();
 	}, [refreshProjectsContext]);
+
+	useEffect(() => {
+		const projectToSelect = projects.find(
+			(project) => project.id == selectedProject.id
+		);
+		if (projectToSelect) {
+			setSelectedProject(projectToSelect);
+		} else {
+			setSelectedProject(projects[0]);
+		}
+	}, [projects]);
+
+	useEffect(() => {
+		if (selectedProject.links.length > 0) {
+			setSelectedLink(selectedProject.links[0]);
+		} else {
+			setSelectedLink({
+				_id: "",
+				name: "",
+				numLeads: 0,
+				active: false,
+				link: "",
+			});
+		}
+	}, [selectedProject]);
 
 	useEffect(() => {
 		setMessagesArray(message.split("\n"));
@@ -192,7 +189,10 @@ const Links: React.FC = () => {
 								name="projectID"
 								isRequired>
 								{projects.map((project, i) => (
-									<option value={project.id} key={i}>
+									<option
+										value={project.id}
+										key={i}
+										selected={project.id == selectedProject.id}>
 										{project.name}
 									</option>
 								))}
@@ -261,15 +261,17 @@ const Links: React.FC = () => {
 								color="gray.600"
 								name="projectID"
 								onChange={(event) => {
-									const hasLinks = Boolean(
-										projects[event.target.selectedIndex].links[0]
-									);
+									const hasLinks =
+										projects[event.target.selectedIndex].links?.length > 0;
+
 									setSelectedProject(projects[event.target.selectedIndex]);
-									unselectLink();
 									setReadOnlyForm(!hasLinks);
 								}}>
 								{projects.map((project, i) => (
-									<option value={project.id} key={i}>
+									<option
+										value={project.id}
+										key={i}
+										selected={project.id == selectedProject.id}>
 										{project.name}
 									</option>
 								))}
@@ -279,7 +281,7 @@ const Links: React.FC = () => {
 							<InputLeftAddon children="Link" />
 							<Select
 								placeholder={
-									readOnlyForm && !selectedProject?.links[0]
+									readOnlyForm && selectedProject?.links?.length == 0
 										? "nenhum link cadastrado neste projeto"
 										: "Selecione um link para alterar"
 								}
@@ -290,11 +292,24 @@ const Links: React.FC = () => {
 								onChange={(event) => {
 									const index = event.target.selectedIndex;
 									setReadOnlyForm(index === 0);
-									setSelectedLink(selectedProject.links[index - 1]);
+									if (index !== 0) {
+										setSelectedLink(selectedProject.links[index - 1]);
+									} else {
+										setSelectedLink({
+											_id: "",
+											name: "",
+											active: false,
+											numLeads: 0,
+											link: "",
+										});
+									}
 								}}
 								isRequired>
 								{selectedProject.links?.map((link, i) => (
-									<option value={link._id} key={i}>
+									<option
+										value={link._id}
+										key={i}
+										selected={link._id == selectedLink?._id}>
 										{link.name} ({link.link})
 									</option>
 								))}
@@ -305,7 +320,7 @@ const Links: React.FC = () => {
 							<InputLeftAddon children="Nome" />
 							<Input
 								placeholder={
-									readOnlyForm && !selectedProject.links[0]
+									readOnlyForm && selectedProject?.links?.length == 0
 										? "nenhum link cadastrado neste projeto"
 										: "digite um novo nome para o link"
 								}
@@ -326,7 +341,7 @@ const Links: React.FC = () => {
 							<InputLeftAddon children="URL" />
 							<Input
 								placeholder={
-									readOnlyForm && !selectedProject.links[0]
+									readOnlyForm && selectedProject?.links?.length == 0
 										? "nenhum link cadastrado neste projeto"
 										: "link do grupo de whatsapp"
 								}
@@ -348,7 +363,7 @@ const Links: React.FC = () => {
 							<InputLeftAddon children="Leads" />
 							<Input
 								placeholder={
-									readOnlyForm && !selectedProject.links[0]
+									readOnlyForm && selectedProject?.links?.length == 0
 										? "nenhum link cadastrado neste projeto"
 										: "número de leads entre 0 e 257"
 								}

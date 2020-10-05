@@ -84,21 +84,6 @@ export default function Projects() {
 		}
 	}
 
-	async function refreshProjects() {
-		try {
-			const { data } = await axios.get("/api/projects", {
-				headers: { Authorization: token },
-			});
-
-			if (data) {
-				setProjects(data);
-				setSelectedProject(data[0]);
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	}
-
 	function handleSelectProject(event) {
 		const projectIdToFind = event.target.value;
 		const projectToSelect = projects.find(
@@ -114,8 +99,9 @@ export default function Projects() {
 			const { data } = await axios.patch("/api/projects", selectedProject, {
 				headers: { Authorization: token },
 			});
-			setRefreshProjectsContext(!refreshProjectsContext);
 			setMessage(data.message);
+			if (data.message !== "Nenhuma alteração a ser salva neste projeto.")
+				setRefreshProjectsContext(!refreshProjectsContext);
 		} catch (error) {
 			if (error.reponse) setMessage(error.response.data);
 		}
@@ -123,8 +109,32 @@ export default function Projects() {
 
 	useEffect(() => {
 		refreshProjects();
+
+		async function refreshProjects() {
+			try {
+				const { data } = await axios.get("/api/projects", {
+					headers: { Authorization: token },
+				});
+
+				if (data) {
+					setProjects(data);
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		}
 	}, [refreshProjectsContext]);
 
+	useEffect(() => {
+		const projectToSelect = projects.find(
+			(project) => project.id == selectedProject.id
+		);
+		if (projectToSelect) {
+			setSelectedProject(projectToSelect);
+		} else {
+			setSelectedProject(projects[0]);
+		}
+	}, [projects]);
 	useEffect(() => {
 		setMessagesArray(message.split("\n"));
 	}, [message]);
@@ -181,7 +191,10 @@ export default function Projects() {
 									isRequired>
 									{projects.map((project, index) => {
 										return (
-											<option value={project.id} key={index}>
+											<option
+												value={project.id}
+												key={index}
+												selected={selectedProject.id == project.id}>
 												{project.name}
 											</option>
 										);

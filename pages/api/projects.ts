@@ -104,6 +104,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 		} = req.body;
 		if (req.method == "POST") {
 			const slug = stringToSlug(name);
+			const team = stringToSlug(req.body.team || "default");
 			const { ops } = await projectsCollection.insertOne({
 				name,
 				description,
@@ -112,6 +113,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 				trackerGoogleAds,
 				trackerFacebook,
 				links: links || [],
+				team,
 			});
 			const id = ops[0]._id.toHexString();
 			return res.json({ id, slug });
@@ -129,6 +131,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 						"O projectID precisa ser uma número hexadecimal com 24 caracteres.",
 				});
 			const slug = stringToSlug(name);
+			const team = stringToSlug(req.body.team || "default");
 			const serializedLinks = links.map((link) => {
 				return { ...link, _id: new ObjectId(link._id) };
 			});
@@ -140,6 +143,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 				trackerGoogleAds,
 				trackerFacebook,
 				links: serializedLinks,
+				team,
 			};
 			const { result } = await projectsCollection.updateOne(
 				{ _id },

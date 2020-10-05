@@ -34,6 +34,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 			name: "Administrador",
 			email,
 			password: hash,
+			teams: ["default"],
 		});
 		if (password !== process.env.ADMIN_PASSWORD)
 			return res.status(403).json({ message: "Senha incorreta" });
