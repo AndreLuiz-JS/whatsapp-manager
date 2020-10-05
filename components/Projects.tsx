@@ -107,7 +107,19 @@ export default function Projects() {
 		if (projectToSelect) setSelectedProject(projectToSelect);
 	}
 
-	async function handleSaveProject(event) {}
+	async function handleUpdateProject(event) {
+		event.preventDefault();
+		setMessage("Salvando...");
+		try {
+			const { data } = await axios.patch("/api/projects", selectedProject, {
+				headers: { Authorization: token },
+			});
+			setRefreshProjectsContext(!refreshProjectsContext);
+			setMessage(data.message);
+		} catch (error) {
+			if (error.reponse) setMessage(error.response.data);
+		}
+	}
 
 	useEffect(() => {
 		refreshProjects();
@@ -158,7 +170,7 @@ export default function Projects() {
 							as="form"
 							margin="16px auto"
 							gap="16px"
-							onSubmit={handleSaveProject}>
+							onSubmit={handleUpdateProject}>
 							<InputGroup>
 								<InputLeftAddon children="Projeto" />
 								<Select
@@ -176,7 +188,29 @@ export default function Projects() {
 									})}
 								</Select>
 							</InputGroup>
-							<ProjectFields />
+							<ProjectFields
+								description={selectedProject.description}
+								name={selectedProject.name}
+								trackerFacebook={selectedProject.trackerFacebook}
+								trackerGoogleAnalytics={selectedProject.trackerGoogleAnalytics}
+								trackerGoogleAds={selectedProject.trackerGoogleAds}
+								update={({
+									name,
+									description,
+									trackerFacebook,
+									trackerGoogleAnalytics,
+									trackerGoogleAds,
+								}) => {
+									setSelectedProject({
+										...selectedProject,
+										name,
+										description,
+										trackerFacebook,
+										trackerGoogleAds,
+										trackerGoogleAnalytics,
+									});
+								}}
+							/>
 							<Text>Links</Text>
 							<Grid gridTemplateColumns="3fr 5fr 150px 150px" gap="8px">
 								{selectedProject.links?.map((link, index) => {
@@ -230,7 +264,7 @@ export default function Projects() {
 				</AccordionItem>
 			</Accordion>
 			{messagesArray.map((message, i) => (
-				<Text textAlign="center" key={i}>
+				<Text textAlign="center" key={i} color="red.300">
 					{message}
 				</Text>
 			))}

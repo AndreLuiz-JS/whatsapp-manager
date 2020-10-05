@@ -400,7 +400,7 @@ const Links: React.FC = () => {
 				</AccordionPanel>
 			</AccordionItem>
 			{messagesArray.map((message, i) => (
-				<Text textAlign="center" key={i}>
+				<Text textAlign="center" key={i} color="red.300">
 					{message}
 				</Text>
 			))}

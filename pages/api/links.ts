@@ -68,11 +68,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 					{ projection: { links: true, _id: false } }
 				);
 				if (!project)
-					return res
-						.status(404)
-						.json({
-							message: "Nenhum projeto encontrado como id especificado.",
-						});
+					return res.status(404).json({
+						message: "Nenhum projeto encontrado como id especificado.",
+					});
 				return res.json(project.links);
 				/**/
 			}
@@ -164,14 +162,18 @@ export default async (req: NowRequest, res: NowResponse) => {
 			for (const key of Object.keys(updateObject)) {
 				if (updateObject[key] === undefined) delete updateObject[key];
 			}
+			const teste = await projectsCollection.findOne({
+				links: { $elemMatch: { _id } },
+			});
 			const response = await projectsCollection.updateOne(
 				{
-					links: { $elemMatch: { _id } },
+					"links._id": _id,
 				},
 				{
 					$set: updateObject,
 				}
 			);
+
 			return res.json({ updated: response.modifiedCount > 0 });
 		}
 		/**/

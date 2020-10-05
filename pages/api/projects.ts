@@ -7,7 +7,7 @@ import initMiddleware from "../../lib/init-middleware";
 
 const cors = initMiddleware(
 	Cors({
-		methods: ["POST", "GET"],
+		methods: ["POST", "GET", "PATCH"],
 	})
 );
 export interface ILink {
@@ -94,16 +94,15 @@ export default async (req: NowRequest, res: NowResponse) => {
 			return res.json(projects);
 		}
 
+		const {
+			name,
+			description,
+			links,
+			trackerGoogleAnalytics,
+			trackerGoogleAds,
+			trackerFacebook,
+		} = req.body;
 		if (req.method == "POST") {
-			const {
-				name,
-				description,
-				links,
-				trackerGoogleAnalytics,
-				trackerGoogleAds,
-				trackerFacebook,
-			} = req.body;
-			console.log(req.body);
 			const slug = stringToSlug(name);
 			const { ops } = await projectsCollection.insertOne({
 				name,
@@ -117,7 +116,46 @@ export default async (req: NowRequest, res: NowResponse) => {
 			const id = ops[0]._id.toHexString();
 			return res.json({ id, slug });
 		}
+
+		if (req.method == "PATCH") {
+			if (!id)
+				return res.status(400).json({
+					message: "Deve ser informado o id do link na variável id.",
+				});
+			const _id = new ObjectId(req.body.id);
+			if (!ObjectId.isValid(id))
+				return res.status(400).json({
+					message:
+						"O projectID precisa ser uma número hexadecimal com 24 caracteres.",
+				});
+			const slug = stringToSlug(name);
+			const serializedLinks = links.map((link) => {
+				return { ...link, _id: new ObjectId(link._id) };
+			});
+			const updateObject = {
+				name,
+				description,
+				slug,
+				trackerGoogleAnalytics,
+				trackerGoogleAds,
+				trackerFacebook,
+				links: serializedLinks,
+			};
+			const { result } = await projectsCollection.updateOne(
+				{ _id },
+				{ $set: updateObject }
+			);
+
+			if (result.ok == 1) {
+				if (result.nModified > 0)
+					return res.json({ message: "Projeto atualizado com sucesso" });
+				return res.json({
+					message: "Nenhuma alteração a ser salva neste projeto.",
+				});
+			}
+		}
 	} catch (err) {
+		console.error(err);
 		return res.status(400).json(err);
 	}
 };

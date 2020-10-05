@@ -1,4 +1,5 @@
 import { InputGroup, InputLeftAddon, Input, Grid, Text } from "@chakra-ui/core";
+import { useEffect, useState } from "react";
 
 export interface IProjectFields {
 	name?: string;
@@ -6,6 +7,7 @@ export interface IProjectFields {
 	trackerGoogleAnalytics?: string;
 	trackerGoogleAds?: string;
 	trackerFacebook?: string;
+	update?: Function;
 }
 
 export default function ProjectFields({
@@ -14,7 +16,36 @@ export default function ProjectFields({
 	trackerGoogleAnalytics,
 	trackerGoogleAds,
 	trackerFacebook,
+	update,
 }: IProjectFields) {
+	const [projectValues, setProjectValues] = useState({
+		name,
+		description,
+		trackerFacebook,
+		trackerGoogleAds,
+		trackerGoogleAnalytics,
+	} as IProjectFields);
+
+	useEffect(() => {
+		setProjectValues({
+			name: name || "",
+			description: description || "",
+			trackerFacebook: trackerFacebook || "",
+			trackerGoogleAds: trackerGoogleAds || "",
+			trackerGoogleAnalytics: trackerGoogleAnalytics || "",
+		});
+	}, [
+		name,
+		description,
+		trackerFacebook,
+		trackerGoogleAds,
+		trackerGoogleAnalytics,
+	]);
+
+	useEffect(() => {
+		if (update) update(projectValues);
+	}, [projectValues]);
+
 	return (
 		<>
 			<InputGroup>
@@ -22,7 +53,10 @@ export default function ProjectFields({
 				<Input
 					placeholder="digite um nome para o novo projeto"
 					name="name"
-					value={name}
+					value={projectValues.name}
+					onChange={(event) => {
+						setProjectValues({ ...projectValues, name: event.target.value });
+					}}
 					isRequired
 				/>
 			</InputGroup>
@@ -31,7 +65,13 @@ export default function ProjectFields({
 				<Input
 					placeholder="uma breve descrição"
 					name="description"
-					value={description}
+					value={projectValues.description}
+					onChange={(event) => {
+						setProjectValues({
+							...projectValues,
+							description: event.target.value,
+						});
+					}}
 					isRequired
 				/>
 			</InputGroup>
@@ -42,8 +82,13 @@ export default function ProjectFields({
 					<Input
 						placeholder="id do Google Analytics tracker"
 						name="trackerGoogleAnalytics"
-						value={trackerGoogleAnalytics}
-						isRequired
+						value={projectValues.trackerGoogleAnalytics}
+						onChange={(event) => {
+							setProjectValues({
+								...projectValues,
+								trackerGoogleAnalytics: event.target.value,
+							});
+						}}
 					/>
 				</InputGroup>
 				<InputGroup>
@@ -51,8 +96,13 @@ export default function ProjectFields({
 					<Input
 						placeholder="id do Google Ads tracker"
 						name="trackerGoogleAds"
-						value={trackerGoogleAds}
-						isRequired
+						value={projectValues.trackerGoogleAds}
+						onChange={(event) => {
+							setProjectValues({
+								...projectValues,
+								trackerGoogleAds: event.target.value,
+							});
+						}}
 					/>
 				</InputGroup>
 				<InputGroup>
@@ -60,8 +110,13 @@ export default function ProjectFields({
 					<Input
 						placeholder="id do Facebook tracker"
 						name="trackerFacebook"
-						value={trackerFacebook}
-						isRequired
+						value={projectValues.trackerFacebook}
+						onChange={(event) => {
+							setProjectValues({
+								...projectValues,
+								trackerFacebook: event.target.value,
+							});
+						}}
 					/>
 				</InputGroup>
 			</Grid>
