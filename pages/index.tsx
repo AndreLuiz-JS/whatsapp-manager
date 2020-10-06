@@ -6,16 +6,19 @@ import { Grid, Flex, Text } from "@chakra-ui/core";
 import Input from "../components/Input";
 import Divider from "../components/Divider";
 import { UserContext } from "./admin";
+import Loading from "../components/Loading";
 
 export default function Home() {
 	const [statusMessage, setStatusMessage] = useState(
 		"Faça seu login na plataforma"
 	);
 	const [statusMessageColor, setStatusMessageColor] = useState("white");
+	const [loading, setLoading] = useState(false);
 	const userInfo = useContext(UserContext);
 
 	async function handleSubmitForm(event) {
 		event.preventDefault();
+		setLoading(true);
 		const form = event.target;
 		const email = form.querySelector("input[type=email]").value;
 		const password = form.querySelector("input[type=password]").value;
@@ -32,8 +35,11 @@ export default function Home() {
 		} catch (err) {
 			setStatusMessage(err.response.data.message);
 			setStatusMessageColor("red.400");
+			setLoading(false);
 		}
 	}
+
+	if (loading) return <Loading />;
 
 	return (
 		<div>
