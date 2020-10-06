@@ -104,9 +104,19 @@ export default async (req: NowRequest, res: NowResponse) => {
 			trackerGoogleAds,
 			trackerFacebook,
 		} = req.body;
+		const { teams: currentTeams } = await usersCollection.findOne(
+			{
+				email: process.env.ADMIN_EMAIL,
+			},
+			{ projection: { teams: true } }
+		);
 		if (req.method == "POST") {
 			const slug = stringToSlug(name);
 			const team = stringToSlug(req.body.team || "default");
+			if (!currentTeams.includes(team))
+				return res
+					.status(400)
+					.json({ message: `O time ${team} não está cadastrado.` });
 			const { ops } = await projectsCollection.insertOne({
 				name,
 				description,
@@ -134,6 +144,10 @@ export default async (req: NowRequest, res: NowResponse) => {
 				});
 			const slug = stringToSlug(name);
 			const team = stringToSlug(req.body.team || "default");
+			if (!currentTeams.includes(team))
+				return res
+					.status(400)
+					.json({ message: `O time ${team} não está cadastrado.` });
 			const serializedLinks = links.map((link) => {
 				return { ...link, _id: new ObjectId(link._id) };
 			});

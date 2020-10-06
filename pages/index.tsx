@@ -84,7 +84,7 @@ export default function Home() {
 							backgroundColor="blue.500"
 							height="50px"
 							borderRadius="sm"
-							margin={6}
+							margin="16px auto"
 							_hover={{ backgroundColor: "blue.600" }}
 							value="ENTRAR"
 							isRequired

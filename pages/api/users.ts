@@ -41,10 +41,6 @@ export default async (req: NowRequest, res: NowResponse) => {
 			{ projection: { name: true, teams: true } }
 		);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
-		if (!user.teams?.includes("adm"))
-			return res
-				.status(403)
-				.json({ message: "Acesso restrito a administradores." });
 
 		const { teams: currentTeams } = await usersCollection.findOne(
 			{
@@ -72,7 +68,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 					message: "É preciso enviar um array com os times do usuário.",
 				});
 			const seralizedTeams = teams.map((team) => {
-				if (currentTeams?.includes(team)) return team;
+				if (currentTeams?.includes(team) && user.teams?.includes(team))
+					return team;
 			});
 			if (seralizedTeams.length == 0)
 				return res.status(400).json({
