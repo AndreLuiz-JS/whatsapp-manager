@@ -289,10 +289,10 @@ export default function Projects() {
 			))}
 			<Grid
 				marginTop="24px"
-				gridTemplateColumns="2fr 6fr 2fr 1fr"
+				gridTemplateColumns="2fr 6fr 2fr 2fr 1fr"
 				gridTemplateAreas="
-				'title title title title'
-				'. . . .'
+				'title title title title title'
+				'. . . . .'
 				"
 				backgroundColor="gray.900"
 				padding="8px"
@@ -302,6 +302,7 @@ export default function Projects() {
 				</Heading>
 				<Text fontWeight="bold">Projeto</Text>
 				<Text>Descrição</Text>
+				<Text>Time</Text>
 				<Text>Slug</Text>
 				<Text>Nº Links</Text>
 				{projects.map((project, i) => (
@@ -311,6 +312,9 @@ export default function Projects() {
 						</Text>
 						<Text padding="8px" borderTop="solid 1px white">
 							{project.description}
+						</Text>
+						<Text padding="8px" borderTop="solid 1px white">
+							{project.team}
 						</Text>
 						<Text padding="8px" borderTop="solid 1px white">
 							{project.slug}
