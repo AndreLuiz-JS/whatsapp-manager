@@ -106,7 +106,7 @@ export default function Projects() {
 			if (data.message !== "Nenhuma alteração a ser salva neste projeto.")
 				setRefreshProjectsContext(!refreshProjectsContext);
 		} catch (error) {
-			if (error.reponse) setMessage(error.response.data);
+			if (error.reponse.data) setMessage(error.response.data.message);
 		}
 	}
 

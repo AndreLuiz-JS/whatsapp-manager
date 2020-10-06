@@ -96,6 +96,7 @@ const Admin = () => {
 					<Tab>Links</Tab>
 					<Tab>Projetos</Tab>
 					<Tab>Novo usuário</Tab>
+					{userInfo.teams.includes("adm") && <Tab>Times</Tab>}
 				</TabList>
 				<RefreshProjects.Provider
 					value={{ refreshProjectsContext, setRefreshProjectsContext }}>

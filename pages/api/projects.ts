@@ -103,6 +103,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 			trackerGoogleAnalytics,
 			trackerGoogleAds,
 			trackerFacebook,
+			team,
 		} = req.body;
 		const { teams: currentTeams } = await usersCollection.findOne(
 			{
@@ -112,11 +113,11 @@ export default async (req: NowRequest, res: NowResponse) => {
 		);
 		if (req.method == "POST") {
 			const slug = stringToSlug(name);
-			const team = stringToSlug(req.body.team || "default");
-			if (!currentTeams.includes(team))
+			const serializedTeam = stringToSlug(team);
+			if (!currentTeams.includes(serializedTeam))
 				return res
 					.status(400)
-					.json({ message: `O time ${team} não está cadastrado.` });
+					.json({ message: `O time ${serializedTeam} não está cadastrado.` });
 			const { ops } = await projectsCollection.insertOne({
 				name,
 				description,
@@ -143,11 +144,11 @@ export default async (req: NowRequest, res: NowResponse) => {
 						"O projectID precisa ser uma número hexadecimal com 24 caracteres.",
 				});
 			const slug = stringToSlug(name);
-			const team = stringToSlug(req.body.team || "default");
-			if (!currentTeams.includes(team))
+			const serializedTeam = stringToSlug(team);
+			if (!currentTeams.includes(serializedTeam))
 				return res
 					.status(400)
-					.json({ message: `O time ${team} não está cadastrado.` });
+					.json({ message: `O time ${serializedTeam} não está cadastrado.` });
 			const serializedLinks = links.map((link) => {
 				return { ...link, _id: new ObjectId(link._id) };
 			});
