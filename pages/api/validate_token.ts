@@ -33,7 +33,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 		);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
 		const teams = user.teams?.filter((team) => team !== "adm") || [];
-		return res.json({ pass: true, userName: user.name, teams });
+		delete user._id;
+		return res.json({ pass: true, user: { ...user, teams } });
 	} catch (err) {
 		return res.status(403).json({ message: "Token inválida" });
 	}

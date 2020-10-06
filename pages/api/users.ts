@@ -17,6 +17,7 @@ interface IUser {
 	name: string;
 	email: string;
 	password: string;
+	teams: string[];
 }
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -34,16 +35,26 @@ export default async (req: NowRequest, res: NowResponse) => {
 		);
 		const _id = new ObjectId(id);
 		const db = await connectToDatabase();
-		const collection = db.collection("users");
-		const user: IUser | null = await collection.findOne(
+		const usersCollection = db.collection("users");
+		const user: IUser | null = await usersCollection.findOne(
 			{ _id },
-			{ projection: { name: true } }
+			{ projection: { name: true, teams: true } }
 		);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
+		if (!user.teams?.includes("adm"))
+			return res
+				.status(403)
+				.json({ message: "Acesso restrito a administradores." });
 
+		const { teams: currentTeams } = await usersCollection.findOne(
+			{
+				email: process.env.ADMIN_EMAIL,
+			},
+			{ projection: { teams: true } }
+		);
 		if (req.method == "GET") {
 			const users = [] as Array<IUser>;
-			await collection
+			await usersCollection
 				.find({}, { projection: { password: false } })
 				.forEach((user: IUser) => {
 					const serializedUser = { id: user._id.toHexString(), ...user };
@@ -51,22 +62,38 @@ export default async (req: NowRequest, res: NowResponse) => {
 					users.push(serializedUser);
 				});
 
-			return res.json(users);
+			return res.json({ users, currentTeams });
 		}
 
 		if (req.method == "POST") {
-			const { name, email, password } = req.body;
+			const { name, email, password, teams } = req.body;
+			if (!Array.isArray(teams))
+				return res.status(400).json({
+					message: "É preciso enviar um array com os times do usuário.",
+				});
+			const seralizedTeams = teams.map((team) => {
+				if (currentTeams?.includes(team)) return team;
+			});
+			if (seralizedTeams.length == 0)
+				return res.status(400).json({
+					message: "Nenhum time válido foi informado no array.",
+				});
 			const hash = await bcrypt.hash(password, 5);
-			const { ops } = await collection.insertOne({
+			const { ops } = await usersCollection.insertOne({
 				name,
 				email,
 				password: hash,
+				teams: seralizedTeams,
 			});
 			const id = ops[0]["_id"];
 			const token = jwt.sign({ id }, process.env.TOKEN_SECRET as string);
 			return res.json({ token });
 		}
 	} catch (err) {
+		if (err.code == 11000 && err.keyValue.email)
+			return res
+				.status(400)
+				.json({ message: `Email ${err.keyValue.email} já está cadastrado` });
 		return res.status(400).json(err);
 	}
 };

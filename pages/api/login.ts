@@ -53,7 +53,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 	const id = user["_id"];
 	const token = jwt.sign({ id }, process.env.TOKEN_SECRET as string);
-	const userName = user.name;
 	const teams = user.teams?.filter((team) => team !== "adm") || [];
-	return res.json({ token, userName, teams });
+	delete user.password;
+	delete user._id;
+	return res.json({ token, user: { ...user, teams } });
 };

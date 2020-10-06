@@ -23,13 +23,13 @@ export default function Home() {
 		const email = form.querySelector("input[type=email]").value;
 		const password = form.querySelector("input[type=password]").value;
 		try {
-			const { token, userName } = (
+			const { token, user } = (
 				await axios.post("/api/login", { email, password })
 			).data;
 			if (token) {
 				localStorage.setItem("token", token);
 				userInfo.token = token;
-				userInfo.name = userName;
+				userInfo.name = user.name;
 				Router.push("/admin");
 			}
 		} catch (err) {
@@ -84,7 +84,7 @@ export default function Home() {
 							backgroundColor="blue.500"
 							height="50px"
 							borderRadius="sm"
-							marginTop={6}
+							margin={6}
 							_hover={{ backgroundColor: "blue.600" }}
 							value="ENTRAR"
 							isRequired

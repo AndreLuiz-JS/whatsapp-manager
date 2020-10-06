@@ -52,8 +52,8 @@ const Admin = () => {
 					if (data.pass) {
 						setUserInfo({
 							token,
-							name: data.userName,
-							teams: data.teams || [],
+							name: data.user.name,
+							teams: data.user.teams || [],
 						});
 					}
 				} else {
