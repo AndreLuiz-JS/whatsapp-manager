@@ -25,6 +25,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 			process.env.TOKEN_SECRET as string
 		);
 		const _id = new ObjectId(id);
+		console.log(`buscando usuário com id ${_id}`);
 		const db = await connectToDatabase();
 		const collection = db.collection("users");
 		const user = await collection.findOne(
@@ -45,6 +46,6 @@ export default async (req: NowRequest, res: NowResponse) => {
 		delete user._id;
 		return res.json({ pass: true, user: { ...user, teams } });
 	} catch (err) {
-		return res.status(403).json({ message: "Token inválida" });
+		return res.status(403).json({ message: "Token inválida", err });
 	}
 };
