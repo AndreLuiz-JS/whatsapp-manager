@@ -32,6 +32,8 @@ export default async (req: NowRequest, res: NowResponse) => {
 			{ _id },
 			{ projection: { name: true, teams: true } }
 		);
+		console.log("Found user");
+		console.log(user);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
 		const allTeams = [] as string[];
 		await db
@@ -46,6 +48,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 		delete user._id;
 		return res.json({ pass: true, user: { ...user, teams } });
 	} catch (err) {
+		console.log(err);
 		return res.status(403).json({ message: "Token inválida", err });
 	}
 };
