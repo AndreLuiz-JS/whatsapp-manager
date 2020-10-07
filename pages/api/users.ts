@@ -12,7 +12,7 @@ const cors = initMiddleware(
 	})
 );
 
-interface IUser {
+export interface IUser {
 	_id: ObjectId;
 	name: string;
 	email: string;
@@ -42,13 +42,20 @@ export default async (req: NowRequest, res: NowResponse) => {
 		);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
 
-		const { teams: currentTeams } = await usersCollection.findOne(
-			{
-				email: process.env.ADMIN_EMAIL,
-			},
-			{ projection: { teams: true } }
-		);
+		const currentTeams = [] as string[];
+		await db
+			.collection("teams")
+			.find()
+			.forEach((team) => {
+				currentTeams.push(team.name);
+			});
+
 		if (req.method == "GET") {
+			if (!user.teams.includes("adm"))
+				return res
+					.status(403)
+					.json({ message: "Acesso restrito a administradores." });
+
 			const users = [] as Array<IUser>;
 			await usersCollection
 				.find({}, { projection: { password: false } })
@@ -67,10 +74,12 @@ export default async (req: NowRequest, res: NowResponse) => {
 				return res.status(400).json({
 					message: "É preciso enviar um array com os times do usuário.",
 				});
+
 			const seralizedTeams = teams.map((team) => {
-				if (currentTeams?.includes(team) && user.teams?.includes(team))
+				if (currentTeams?.includes(team) && user.teams?.includes(team || "adm"))
 					return team;
 			});
+
 			if (seralizedTeams.length == 0)
 				return res.status(400).json({
 					message: "Nenhum time válido foi informado no array.",
@@ -90,7 +99,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 		if (err.code == 11000 && err.keyValue.email)
 			return res
 				.status(400)
-				.json({ message: `Email ${err.keyValue.email} já está cadastrado` });
+				.json({ message: `Email '${err.keyValue.email}' já está cadastrado` });
 		return res.status(400).json(err);
 	}
 };

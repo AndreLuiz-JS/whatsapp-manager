@@ -19,6 +19,7 @@ import {
 import axios from "axios";
 import Router from "next/router";
 import NewUser from "../components/NewUser";
+import NewTeam from "../components/NewTeam";
 import NewProject from "../components/Projects";
 import Links from "../components/Links";
 import Loading from "../components/Loading";
@@ -110,6 +111,11 @@ const Admin = () => {
 						<TabPanel>
 							<NewUser />
 						</TabPanel>
+						{userInfo.teams.includes("adm") && (
+							<TabPanel>
+								<NewTeam />
+							</TabPanel>
+						)}
 					</TabPanels>
 				</RefreshProjects.Provider>
 			</Tabs>

@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import jwt from "jsonwebtoken";
 import Cors from "cors";
 import initMiddleware from "../../lib/init-middleware";
+import stringToSlug from "../../lib/stringToSlug";
 
 const cors = initMiddleware(
 	Cors({
@@ -28,25 +29,6 @@ export interface IProject {
 	trackerFacebook?: string;
 	team: string;
 	links: ILink[];
-}
-
-function stringToSlug(str: string) {
-	str = str.replace(/^\s+|\s+$/g, ""); // trim
-	str = str.toLowerCase();
-
-	// remove accents, swap ñ for n, etc
-	var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-	var to = "aaaaeeeeiiiioooouuuunc------";
-	for (var i = 0, l = from.length; i < l; i++) {
-		str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
-	}
-
-	str = str
-		.replace(/[^a-z0-9 -]/g, "") // remove invalid chars
-		.replace(/\s+/g, "-") // collapse whitespace and replace by -
-		.replace(/-+/g, "-"); // collapse dashes
-
-	return str;
 }
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -105,12 +87,15 @@ export default async (req: NowRequest, res: NowResponse) => {
 			trackerFacebook,
 			team,
 		} = req.body;
-		const { teams: currentTeams } = await usersCollection.findOne(
-			{
-				email: process.env.ADMIN_EMAIL,
-			},
-			{ projection: { teams: true } }
-		);
+
+		const currentTeams = [] as string[];
+		await db
+			.collection("teams")
+			.find()
+			.forEach((team) => {
+				currentTeams.push(team.name);
+			});
+
 		if (req.method == "POST") {
 			const slug = stringToSlug(name);
 			const serializedTeam = stringToSlug(team);
@@ -118,6 +103,13 @@ export default async (req: NowRequest, res: NowResponse) => {
 				return res
 					.status(400)
 					.json({ message: `O time ${serializedTeam} não está cadastrado.` });
+
+			if (!user.teams.includes(serializedTeam || "adm"))
+				return res.status(403).json({
+					message:
+						"Usuário só pode criar projetos no time em que está cadastrado.",
+				});
+
 			const { ops } = await projectsCollection.insertOne({
 				name,
 				description,
@@ -126,7 +118,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 				trackerGoogleAds,
 				trackerFacebook,
 				links: links || [],
-				team,
+				team: serializedTeam,
 			});
 			const id = ops[0]._id.toHexString();
 			return res.json({ id, slug });
@@ -149,9 +141,17 @@ export default async (req: NowRequest, res: NowResponse) => {
 				return res
 					.status(400)
 					.json({ message: `O time ${serializedTeam} não está cadastrado.` });
+
+			if (!user.teams.includes(serializedTeam || "adm"))
+				return res.status(403).json({
+					message:
+						"Usuário só pode alterar projetos no time em que está cadastrado.",
+				});
+
 			const serializedLinks = links.map((link) => {
 				return { ...link, _id: new ObjectId(link._id) };
 			});
+
 			const updateObject = {
 				name,
 				description,
@@ -160,7 +160,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 				trackerGoogleAds,
 				trackerFacebook,
 				links: serializedLinks,
-				team,
+				team: serializedTeam,
 			};
 			const { result } = await projectsCollection.updateOne(
 				{ _id },

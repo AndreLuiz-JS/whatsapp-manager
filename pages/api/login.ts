@@ -30,6 +30,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 	if (email === process.env.ADMIN_EMAIL && !user) {
 		const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 5);
 		await userCollection.createIndex("email", { unique: true });
+		await db.collection("projects").createIndex({ slug: 1 }, { unique: true });
+		await db.collection("teams").createIndex({ name: 1 }, { unique: true });
+		await db.collection("teams").insertOne({ name: "adm" });
 		const { ops } = await userCollection.insertOne({
 			name: "Administrador",
 			email,
@@ -41,7 +44,6 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 		const id = ops[0]["_id"];
 		const token = jwt.sign({ id }, process.env.TOKEN_SECRET as string);
-		await db.collection("projects").createIndex({ slug: 1 }, { unique: true });
 
 		return res.json({ token });
 	}
