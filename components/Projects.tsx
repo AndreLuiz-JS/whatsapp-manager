@@ -35,7 +35,7 @@ export interface IProject {
 
 export default function Projects() {
 	const [message, setMessage] = useState("");
-	const [projects, setProjects] = useState([{}] as IProject[]);
+	const [projects, setProjects] = useState([] as IProject[]);
 	const [selectedProject, setSelectedProject] = useState({} as IProject);
 	const { token } = useContext(UserContext);
 	const { refreshProjectsContext, setRefreshProjectsContext } = useContext(
@@ -295,7 +295,7 @@ export default function Projects() {
 					{message}
 				</Text>
 			))}
-			{selectedProject && (
+			{projects.length > 0 && (
 				<Grid
 					marginTop="24px"
 					gridTemplateColumns="2fr 6fr 2fr 2fr 1fr"
