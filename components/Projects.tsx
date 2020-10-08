@@ -35,7 +35,7 @@ export interface IProject {
 
 export default function Projects() {
 	const [message, setMessage] = useState("");
-	const [projects, setProjects] = useState([{}] as IProject[]);
+	const [projects, setProjects] = useState([] as IProject[]);
 	const [selectedProject, setSelectedProject] = useState({} as IProject);
 	const { token } = useContext(UserContext);
 	const { refreshProjectsContext, setRefreshProjectsContext } = useContext(
@@ -295,44 +295,46 @@ export default function Projects() {
 					{message}
 				</Text>
 			))}
-			<Grid
-				marginTop="24px"
-				gridTemplateColumns="2fr 6fr 2fr 2fr 1fr"
-				gridTemplateAreas="
+			{projects.length > 0 && (
+				<Grid
+					marginTop="24px"
+					gridTemplateColumns="2fr 6fr 2fr 2fr 1fr"
+					gridTemplateAreas="
 				'title title title title title'
 				'. . . . .'
 				"
-				backgroundColor="gray.900"
-				padding="8px"
-				borderRadius="4px">
-				<Heading gridArea="title" margin="8px auto">
-					Projetos cadastrados
-				</Heading>
-				<Text fontWeight="bold">Projeto</Text>
-				<Text>Descrição</Text>
-				<Text>Time</Text>
-				<Text>Slug</Text>
-				<Text>Nº Links</Text>
-				{projects.map((project, i) => (
-					<Fragment key={i}>
-						<Text padding="8px" borderTop="solid 1px white">
-							{project.name}
-						</Text>
-						<Text padding="8px" borderTop="solid 1px white">
-							{project.description}
-						</Text>
-						<Text padding="8px" borderTop="solid 1px white">
-							{project.team}
-						</Text>
-						<Text padding="8px" borderTop="solid 1px white">
-							{project.slug}
-						</Text>
-						<Text padding="8px" borderTop="solid 1px white">
-							{project.links?.length}
-						</Text>
-					</Fragment>
-				))}
-			</Grid>
+					backgroundColor="gray.900"
+					padding="8px"
+					borderRadius="4px">
+					<Heading gridArea="title" margin="8px auto">
+						Projetos cadastrados
+					</Heading>
+					<Text fontWeight="bold">Projeto</Text>
+					<Text>Descrição</Text>
+					<Text>Time</Text>
+					<Text>Slug</Text>
+					<Text>Nº Links</Text>
+					{projects.map((project, i) => (
+						<Fragment key={i}>
+							<Text padding="8px" borderTop="solid 1px white">
+								{project.name}
+							</Text>
+							<Text padding="8px" borderTop="solid 1px white">
+								{project.description}
+							</Text>
+							<Text padding="8px" borderTop="solid 1px white">
+								{project.team}
+							</Text>
+							<Text padding="8px" borderTop="solid 1px white">
+								{project.slug}
+							</Text>
+							<Text padding="8px" borderTop="solid 1px white">
+								{project.links?.length}
+							</Text>
+						</Fragment>
+					))}
+				</Grid>
+			)}
 		</>
 	);
 }
