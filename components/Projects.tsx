@@ -130,7 +130,7 @@ export default function Projects() {
 
 	useEffect(() => {
 		const projectToSelect = projects.find(
-			(project) => project.id == selectedProject.id
+			(project) => project.id == selectedProject?.id
 		);
 		if (projectToSelect) {
 			setSelectedProject(projectToSelect);
@@ -138,6 +138,7 @@ export default function Projects() {
 			setSelectedProject(projects[0]);
 		}
 	}, [projects]);
+
 	useEffect(() => {
 		setMessagesArray(message.split("\n"));
 	}, [message]);
@@ -171,116 +172,123 @@ export default function Projects() {
 						</Grid>
 					</AccordionPanel>
 				</AccordionItem>
-				<AccordionItem>
-					<AccordionHeader>
-						<Box flex="1" textAlign="left">
-							Editar Projeto
-						</Box>
-						<AccordionIcon />
-					</AccordionHeader>
-					<AccordionPanel pb={0}>
-						<Grid
-							as="form"
-							margin="16px auto"
-							gap="16px"
-							onSubmit={handleUpdateProject}>
-							<InputGroup>
-								<InputLeftAddon children="Projeto" />
-								<Select
-									variant="filled"
-									color="gray.600"
-									name="projectID"
-									onChange={handleSelectProject}
-									isRequired>
-									{projects.map((project, index) => {
-										return (
-											<option
-												value={project.id}
-												key={index}
-												selected={selectedProject.id == project.id}>
-												{project.name}
-											</option>
-										);
-									})}
-								</Select>
-							</InputGroup>
-							<ProjectFields
-								description={selectedProject?.description}
-								name={selectedProject?.name}
-								trackerFacebook={selectedProject?.trackerFacebook}
-								trackerGoogleAnalytics={selectedProject?.trackerGoogleAnalytics}
-								trackerGoogleAds={selectedProject?.trackerGoogleAds}
-								team={selectedProject.team}
-								update={({
-									name,
-									description,
-									trackerFacebook,
-									trackerGoogleAnalytics,
-									trackerGoogleAds,
-									team,
-								}) => {
-									setSelectedProject({
-										...selectedProject,
+				{selectedProject && (
+					<AccordionItem>
+						<AccordionHeader>
+							<Box flex="1" textAlign="left">
+								Editar Projeto
+							</Box>
+							<AccordionIcon />
+						</AccordionHeader>
+						<AccordionPanel pb={0}>
+							<Grid
+								as="form"
+								margin="16px auto"
+								gap="16px"
+								onSubmit={handleUpdateProject}>
+								<InputGroup>
+									<InputLeftAddon children="Projeto" />
+									<Select
+										variant="filled"
+										color="gray.600"
+										name="projectID"
+										onChange={handleSelectProject}
+										isRequired>
+										{projects.map((project, index) => {
+											return (
+												<option
+													value={project.id}
+													key={index}
+													selected={selectedProject.id == project.id}>
+													{project.name}
+												</option>
+											);
+										})}
+									</Select>
+								</InputGroup>
+								<ProjectFields
+									description={selectedProject?.description}
+									name={selectedProject?.name}
+									trackerFacebook={selectedProject?.trackerFacebook}
+									trackerGoogleAnalytics={
+										selectedProject?.trackerGoogleAnalytics
+									}
+									trackerGoogleAds={selectedProject?.trackerGoogleAds}
+									team={selectedProject.team}
+									update={({
 										name,
 										description,
 										trackerFacebook,
-										trackerGoogleAds,
 										trackerGoogleAnalytics,
+										trackerGoogleAds,
 										team,
-									});
-								}}
-							/>
-							<Text>Links</Text>
-							<Grid gridTemplateColumns="3fr 5fr 150px 150px" gap="8px">
-								{selectedProject?.links?.map((link, index) => {
-									return (
-										<Fragment key={index}>
-											<InputGroup>
-												<InputLeftAddon children="Link" />
-												<Input value={link.name} isReadOnly />
-											</InputGroup>
-											<InputGroup>
-												<InputLeftAddon children="URL" />
-												<Input type="url" value={link.link} isReadOnly />
-											</InputGroup>
-											<InputGroup>
-												<InputLeftAddon children="Leads" />
-												<Input value={link.numLeads} isReadOnly />
-											</InputGroup>
-											<Checkbox
-												isChecked={selectedProject?.links[index].active}
-												name="active"
-												justifySelf="right"
-												children="ativo?"
-												id={selectedProject?.links[index]._id}
-												onChange={(event) => {
-													const id = event.target.id;
-													const links = selectedProject?.links.map((link) => {
-														if (link._id == id) {
-															const newLink = { ...link, active: !link.active };
-															return newLink;
-														} else {
-															return link;
-														}
-													});
-													setSelectedProject({ ...selectedProject, links });
-												}}
-											/>
-										</Fragment>
-									);
-								})}
+									}) => {
+										setSelectedProject({
+											...selectedProject,
+											name,
+											description,
+											trackerFacebook,
+											trackerGoogleAds,
+											trackerGoogleAnalytics,
+											team,
+										});
+									}}
+								/>
+								<Text>Links</Text>
+								<Grid gridTemplateColumns="3fr 5fr 150px 150px" gap="8px">
+									{selectedProject?.links?.map((link, index) => {
+										return (
+											<Fragment key={index}>
+												<InputGroup>
+													<InputLeftAddon children="Link" />
+													<Input value={link.name} isReadOnly />
+												</InputGroup>
+												<InputGroup>
+													<InputLeftAddon children="URL" />
+													<Input type="url" value={link.link} isReadOnly />
+												</InputGroup>
+												<InputGroup>
+													<InputLeftAddon children="Leads" />
+													<Input value={link.numLeads} isReadOnly />
+												</InputGroup>
+												<Checkbox
+													isChecked={selectedProject?.links[index].active}
+													name="active"
+													justifySelf="right"
+													children="ativo?"
+													id={selectedProject?.links[index]._id}
+													onChange={(event) => {
+														const id = event.target.id;
+														const links = selectedProject?.links.map((link) => {
+															if (link._id == id) {
+																const newLink = {
+																	...link,
+																	active: !link.active,
+																};
+																return newLink;
+															} else {
+																return link;
+															}
+														});
+														setSelectedProject({ ...selectedProject, links });
+													}}
+												/>
+											</Fragment>
+										);
+									})}
+								</Grid>
+								<Input
+									type="submit"
+									backgroundColor="blue.500"
+									_hover={{ backgroundColor: "blue.600" }}
+									value="SALVAR"
+									maxWidth="50%"
+									margin="0 auto"
+								/>
 							</Grid>
-							<Input
-								type="submit"
-								backgroundColor="blue.500"
-								_hover={{ backgroundColor: "blue.600" }}
-								value="SALVAR"
-								maxWidth="50%"
-								margin="0 auto"
-							/>
-						</Grid>
-					</AccordionPanel>
-				</AccordionItem>
+						</AccordionPanel>
+					</AccordionItem>
+				)}
 			</Accordion>
 			{messagesArray.map((message, i) => (
 				<Text textAlign="center" key={i} color="red.300">
