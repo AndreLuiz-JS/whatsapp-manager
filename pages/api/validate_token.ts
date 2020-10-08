@@ -25,15 +25,12 @@ export default async (req: NowRequest, res: NowResponse) => {
 			process.env.TOKEN_SECRET as string
 		);
 		const _id = new ObjectId(id);
-		console.log(`buscando usuário com id ${_id}`);
 		const db = await connectToDatabase();
 		const collection = db.collection("users");
 		const user = await collection.findOne(
 			{ _id },
 			{ projection: { name: true, teams: true } }
 		);
-		console.log("Found user");
-		console.log(user);
 		if (!user) return res.status(403).json({ message: "Token inválida" });
 		const allTeams = [] as string[];
 		await db

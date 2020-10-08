@@ -20,7 +20,7 @@ import axios from "axios";
 import Router from "next/router";
 import NewUser from "../components/NewUser";
 import NewTeam from "../components/NewTeam";
-import NewProject from "../components/Projects";
+import Projects from "../components/Projects";
 import Links from "../components/Links";
 import Loading from "../components/Loading";
 
@@ -94,19 +94,19 @@ const Admin = () => {
 					)
 				</Flex>
 				<TabList>
-					<Tab>Links</Tab>
 					<Tab>Projetos</Tab>
+					<Tab>Links</Tab>
 					<Tab>Novo usuário</Tab>
-					{userInfo.teams.includes("adm") && <Tab>Times</Tab>}
+					{userInfo.teams.includes("adm") && <Tab>Novo Time</Tab>}
 				</TabList>
 				<RefreshProjects.Provider
 					value={{ refreshProjectsContext, setRefreshProjectsContext }}>
 					<TabPanels>
 						<TabPanel>
-							<Links />
+							<Projects />
 						</TabPanel>
 						<TabPanel>
-							<NewProject />
+							<Links />
 						</TabPanel>
 						<TabPanel>
 							<NewUser />

@@ -13,6 +13,7 @@ import {
 	Text,
 	Select,
 	Checkbox,
+	Heading,
 } from "@chakra-ui/core";
 import axios from "axios";
 import { useState, useContext, useEffect } from "react";
@@ -137,7 +138,7 @@ const Links: React.FC = () => {
 
 	useEffect(() => {
 		const projectToSelect = projects.find(
-			(project) => project.id == selectedProject.id
+			(project) => project.id == selectedProject?.id
 		);
 		if (projectToSelect) {
 			setSelectedProject(projectToSelect);
@@ -163,7 +164,12 @@ const Links: React.FC = () => {
 	useEffect(() => {
 		setMessagesArray(message.split("\n"));
 	}, [message]);
-
+	if (projects.length == 0 && !selectedProject)
+		return (
+			<Heading margin="16px auto" textAlign="center">
+				Crie um novo projeto antes de adicionar links
+			</Heading>
+		);
 	return (
 		<Accordion>
 			<AccordionItem>
@@ -192,7 +198,7 @@ const Links: React.FC = () => {
 									<option
 										value={project.id}
 										key={i}
-										selected={project.id == selectedProject.id}>
+										selected={project.id == selectedProject?.id}>
 										{project.name}
 									</option>
 								))}
@@ -271,7 +277,7 @@ const Links: React.FC = () => {
 									<option
 										value={project.id}
 										key={i}
-										selected={project.id == selectedProject.id}>
+										selected={project.id == selectedProject?.id}>
 										{project.name}
 									</option>
 								))}
