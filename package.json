@@ -17,7 +17,7 @@
 		"emotion-theming": "^10.0.27",
 		"jsonwebtoken": "^8.5.1",
 		"mongodb": "^3.6.2",
-		"next": "9.5.2",
+		"next": "9.5.4",
 		"ra-data-simple-rest": "^3.8.3",
 		"react": "16.13.1",
 		"react-admin": "^3.8.4",
